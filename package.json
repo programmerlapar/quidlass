@@ -53,6 +53,7 @@
   "bugs": {
     "url": "https://github.com/programmerlapar/quidlass/issues"
   },
+  "packageManager": "yarn@1.22.22",
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0"
