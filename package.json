@@ -23,14 +23,14 @@
     "build:watch": "rollup -c rollup.config.mjs --watch",
     "dev": "vite --mode demo",
     "preview": "vite preview",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "yarn build",
     "type-check": "tsc --noEmit",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "demo:dev": "cd demo && vite",
-    "demo:build": "cd demo && npm install && vite build",
+    "demo:build": "cd demo && yarn install && vite build",
     "demo:preview": "cd demo && vite preview"
   },
   "keywords": [

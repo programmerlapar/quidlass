@@ -26,16 +26,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: 'yarn'
+
+      - name: Install Yarn
+        run: corepack enable
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
 
       - name: Build library
-        run: npm run build
+        run: yarn build
 
       - name: Build demo
-        run: cd demo && npm ci && npm run build
+        run: cd demo && yarn install --frozen-lockfile && yarn build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
