@@ -10,9 +10,8 @@ export default defineConfig({
       'quidlass': path.resolve(__dirname, '../src'),
     },
   },
-  base: '/quidlass/',
+  base: '/quidlass/demo/',
   build: {
-    outDir: '../docs',
+    outDir: '../docs/demo',
   },
 });
-
