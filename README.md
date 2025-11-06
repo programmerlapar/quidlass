@@ -112,3 +112,11 @@ MIT
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+## Support
+
+If you find this project helpful, consider buying me a coffee! ☕
+
+[![PayPal](https://img.shields.io/badge/PayPal-Support-blue?logo=paypal)](https://www.paypal.com/paypalme/programmerlapar)
+
+[Support via PayPal](https://www.paypal.com/paypalme/programmerlapar)
+
