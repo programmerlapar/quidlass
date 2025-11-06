@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
     root: isDemo ? './demo' : './',
     build: isDemo
       ? {
-          outDir: '../demo/dist',
+          outDir: '../docs',
         }
       : {},
   };

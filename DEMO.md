@@ -42,7 +42,7 @@ cd demo
 npm run build
 ```
 
-Build output will be in `demo/dist/`
+Build output will be in `docs/` (for GitHub Pages deployment)
 
 ## Verification
 

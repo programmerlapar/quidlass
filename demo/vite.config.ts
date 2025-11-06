@@ -12,7 +12,7 @@ export default defineConfig({
   },
   base: '/quidlass/',
   build: {
-    outDir: 'dist',
+    outDir: '../docs',
   },
 });
 

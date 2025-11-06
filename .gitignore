@@ -39,6 +39,6 @@ lerna-debug.log*
 # Vite
 .vite/
 
-# Demo build
-demo/dist/
+# Demo build (now builds to /docs for GitHub Pages)
+# docs/ is intentionally not ignored so it can be committed for GitHub Pages
 
