@@ -1,0 +1,83 @@
+{
+  "name": "quidlass",
+  "version": "1.0.0",
+  "description": "A beautiful liquid glassmorphism React component with customizable effects",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "rollup -c rollup.config.mjs",
+    "build:watch": "rollup -c rollup.config.mjs --watch",
+    "dev": "vite --mode demo",
+    "preview": "vite preview",
+    "prepublishOnly": "yarn build",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "demo:dev": "cd demo && vite",
+    "demo:build": "cd demo && yarn install && vite build",
+    "demo:preview": "cd demo && vite preview"
+  },
+  "keywords": [
+    "react",
+    "glassmorphism",
+    "liquid-glass",
+    "glass-effect",
+    "ui-component",
+    "backdrop-filter",
+    "svg-filter",
+    "displacement-map"
+  ],
+  "author": "programmerlapar",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/programmerlapar/quidlass.git"
+  },
+  "homepage": "https://github.com/programmerlapar/quidlass#readme",
+  "bugs": {
+    "url": "https://github.com/programmerlapar/quidlass/issues"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^12.0.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.4.0",
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/ui": "^2.1.0",
+    "jsdom": "^24.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rollup": "^4.18.0",
+    "rollup-plugin-dts": "^6.1.1",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "tslib": "^2.8.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.5.0",
+    "vite": "^5.4.0",
+    "vitest": "^2.1.0"
+  }
+}

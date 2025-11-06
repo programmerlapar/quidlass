@@ -1,0 +1,29 @@
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+@keyframes particleFloat {
+  0%, 100% { transform: translate(0, 0); opacity: 0.6; }
+  50% { transform: translate(var(--particle-x, 0), var(--particle-y, 0)); opacity: 1; }
+}
+
+.background-gradient {
+  animation: gradientShift 15s ease infinite;
+}
+
+.background-circle {
+  animation: float 8s ease-in-out infinite;
+}
+
+.background-particle {
+  animation: particleFloat 10s ease-in-out infinite;
+}
+
