@@ -33,12 +33,6 @@ export interface LiquidGlassProps {
 	 */
 	shadowIntensity?: number;
 	/**
-	 * Elasticity factor for the rounded rectangle SDF calculation
-	 * Controls the shape of the liquid distortion effect
-	 * @default 0.6
-	 */
-	elasticity?: number;
-	/**
 	 * Swirl intensity for the vortex effect
 	 * Higher values create stronger swirl patterns, especially near borders
 	 * Simulates liquid being poured into the center
@@ -65,6 +59,15 @@ export interface LiquidGlassProps {
 	 * @default 12
 	 */
 	edgeThicknessPx?: number;
+	/**
+	 * Swirl offset controls the gap between component edges and the swirl effect band.
+	 * 0.0 = no gap, swirl effect starts at the edges (default)
+	 * 1.0 = maximum gap, swirl effect starts at the center
+	 * Values between 0.0 and 1.0 create a gap, moving the swirl effect inward from edges
+	 * The gap is the distance from component edges to where the swirl effect begins
+	 * @default 0.0
+	 */
+	swirlOffset?: number;
 	/**
 	 * Which corner/edge region(s) should have the swirl effect.
 	 * Can be a single value or an array for multiple selections.
@@ -141,10 +144,11 @@ export interface LiquidGlassProps {
  * @param brightness - Brightness multiplier (default: 1.05)
  * @param saturation - Saturation multiplier (default: 1.1)
  * @param shadowIntensity - Shadow opacity (default: 0.25)
- * @param elasticity - Elasticity factor for distortion shape (default: 0.6)
  * @param swirlIntensity - Swirl intensity for vortex effect (default: 8)
  * @param swirlScale - Swirl scale controls size/zoom (default: 1.0)
  * @param swirlRadius - Swirl radius controls extent from center/edges (default: 1.0)
+ * @param edgeThicknessPx - Thickness in pixels of edge band where swirl is applied (default: 12)
+ * @param swirlOffset - Swirl offset controls gap from edges: 0.0=no gap (edges), 1.0=max gap (center) (default: 0.0)
  * @param swirlEdges - Which corner/edge region should have swirl effect (default: 'all')
 	 * @param zIndex - Z-index for layering (default: 9999)
 	 * @param textShadow - Text shadow for text inside (default: true, or custom CSS value)
@@ -169,11 +173,11 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	brightness = 1.05,
 	saturation = 1.1,
 	shadowIntensity = 0.25,
-	elasticity = 0.6,
 	swirlIntensity = 8,
 	swirlScale = 1.0,
 	swirlRadius = 1.0,
 	edgeThicknessPx = 12,
+	swirlOffset = 0.0,
 	swirlEdges = 'all',
 	zIndex = 9999,
 	textShadow = true,
@@ -197,7 +201,7 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	const [height, setHeight] = useState(200);
 	const lastSizeRef = useRef({ width: 300, height: 200 });
 
-	const canvasDPI = 1;
+	const canvasDPI = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
 
 	/**
 	 * Smooth step interpolation function for easing
@@ -284,10 +288,37 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		const sdfW = halfW - borderRadius * canvasDPI;
 		const sdfH = halfH - borderRadius * canvasDPI;
 		const sdfRadius = borderRadius * canvasDPI;
-		const threshold = Math.max(edgeThicknessPx * canvasDPI, 1);
 		const maxRadius = Math.sqrt(0.5 * 0.5 + 0.5 * 0.5); // Max distance from center
 		const minDimension = Math.min(w, h);
-		const baseDisplacementFactor = (minDimension / 100.0) * 0.05;
+		const maxDimension = Math.max(w, h);
+		
+		// Make threshold adaptive to component size for small components
+		// CRITICAL: Threshold must never exceed the maximum possible distance from any edge
+		// Maximum distance from an edge is half the smallest dimension (minDimension / 2)
+		const maxPossibleDistance = minDimension / 2;
+		
+		// Calculate adaptive threshold based on component size
+		// For very small components (< 60px), use larger percentage to ensure visibility
+		// For small components (60-100px), use moderate percentage
+		// For larger components, use the configured edgeThicknessPx
+		let adaptiveThreshold: number;
+		if (minDimension < 60) {
+			// For very small components (floating buttons), use 80% of smallest dimension
+			// But cap at maxPossibleDistance to ensure it works
+			adaptiveThreshold = Math.min(minDimension * 0.8, maxPossibleDistance);
+		} else if (minDimension < 100) {
+			// For small components (buttons), use 60% of smallest dimension
+			adaptiveThreshold = Math.min(minDimension * 0.6, maxPossibleDistance);
+		} else {
+			// For larger components, use configured value
+			adaptiveThreshold = Math.min(edgeThicknessPx * canvasDPI, minDimension * 0.4, maxPossibleDistance);
+		}
+		// Ensure threshold is at least 1 pixel but never exceeds max possible distance
+		const threshold = Math.max(Math.min(adaptiveThreshold, maxPossibleDistance), 1);
+		
+		// Calculate base displacement factor, ensuring minimum for small components
+		// This ensures swirl effect is visible on buttons and small components
+		const baseDisplacementFactor = Math.max((minDimension / 100.0) * 0.05, 0.01);
 		const displacementFactor = baseDisplacementFactor * (swirlIntensity / 10.0);
 		const swirlScaleClamped = Math.max(swirlScale, 0.1);
 		const swirlRadiusClamped = Math.max(swirlRadius, 0.1);
@@ -308,8 +339,6 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 			const iy = uvY - 0.5;
 			const isTopHalf = pxY < halfH;
 			const isBottomHalf = pxY >= halfH;
-			const distFromTop = pxY;
-			const distFromBottom = containerH - pxY;
 
 			for (let x = 0; x < w; x++) {
 				const pxX = x + 0.5;
@@ -331,9 +360,51 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 				
 				const isInsideRoundedRect = sdfValue < 0;
 				
-				// Distance from each edge (in pixels)
+				// Distance from container edges (straight edges) - not rounded boundary
+				// This ensures swirl effect stays at edges regardless of border radius
 				const distFromLeft = pxX;
 				const distFromRight = containerW - pxX;
+				const distFromTop = pxY;
+				const distFromBottom = containerH - pxY;
+				
+				// Calculate maximum distance from edges to center for offset calculation
+				const maxDistanceToCenter = Math.min(halfW, halfH);
+				
+				// Calculate offset distance: gap between component edges and swirl effect band
+				// swirlOffset = 0.0 means no gap (swirl at edges)
+				// swirlOffset > 0.0 creates a gap (swirl moves inward from edges)
+				const offsetDistance = swirlOffset * maxDistanceToCenter;
+				
+				// Calculate adjusted distance for each edge separately
+				// This ensures swirl effect applies to ALL edges, not just the closest one
+				const adjustedDistFromLeft = distFromLeft - offsetDistance;
+				const adjustedDistFromRight = distFromRight - offsetDistance;
+				const adjustedDistFromTop = distFromTop - offsetDistance;
+				const adjustedDistFromBottom = distFromBottom - offsetDistance;
+				
+				// Calculate influence from each edge separately
+				// This ensures all edges get the swirl effect, especially important for small components
+				// For very small components, ensure we can still see the effect even at the edges
+				// Use a minimum threshold of at least 2 pixels to ensure visibility
+				const minThreshold = Math.max(threshold, 2);
+				
+				const influenceFromLeft = (adjustedDistFromLeft >= 0) 
+					? smoothStep(minThreshold, 0, adjustedDistFromLeft) : 0;
+				const influenceFromRight = (adjustedDistFromRight >= 0) 
+					? smoothStep(minThreshold, 0, adjustedDistFromRight) : 0;
+				const influenceFromTop = (adjustedDistFromTop >= 0) 
+					? smoothStep(minThreshold, 0, adjustedDistFromTop) : 0;
+				const influenceFromBottom = (adjustedDistFromBottom >= 0) 
+					? smoothStep(minThreshold, 0, adjustedDistFromBottom) : 0;
+				
+				// Use maximum influence from any edge
+				// This ensures the swirl effect is visible on all edges
+				const maxEdgeInfluence = Math.max(
+					influenceFromLeft,
+					influenceFromRight,
+					influenceFromTop,
+					influenceFromBottom
+				);
 				
 				// Determine which corner/edge region this pixel is in
 				const isLeftHalf = pxX < halfW;
@@ -365,18 +436,10 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 					}
 				}
 				
-				// Find the minimum distance to any edge
-				const minEdgeDistance = Math.min(
-					distFromLeft,
-					distFromRight,
-					distFromTop,
-					distFromBottom
-				);
-				
-				// Smooth the transition for better visual quality
-				const borderInfluence = (isInSwirlRegion && isInsideRoundedRect)
-					? smoothStep(threshold, 0, minEdgeDistance)
-					: 0.0;
+				// Apply swirl effect based on edge influence
+				// Use maximum influence from any edge to ensure all edges get the swirl effect
+				// This is especially important for small components where all edges should be visible
+				const borderInfluence = isInSwirlRegion ? maxEdgeInfluence : 0.0;
 
 				// Convert to polar coordinates for vortex effect
 				const angle = Math.atan2(iy, ix);
@@ -491,11 +554,11 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		height,
 		canvasDPI,
 		borderRadius,
-		elasticity,
 		swirlIntensity,
 		swirlScale,
 		swirlRadius,
 		edgeThicknessPx,
+		swirlOffset,
 		swirlEdges,
 		roundedRectSDF,
 		smoothStep,

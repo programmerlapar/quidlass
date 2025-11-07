@@ -236,30 +236,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
       <div className="control-group">
         <label className="control-label">
-          Elasticity: {props.elasticity}
-        </label>
-        <input
-          type="range"
-          min="0"
-          max="2"
-          step="0.01"
-          value={props.elasticity || 0.6}
-          onChange={handleSliderChange('elasticity')}
-          className="control-slider"
-        />
-        <input
-          type="number"
-          min="0"
-          max="2"
-          step="0.01"
-          value={props.elasticity || 0.6}
-          onChange={handleNumberInput('elasticity')}
-          className="control-input"
-        />
-      </div>
-
-      <div className="control-group">
-        <label className="control-label">
           Swirl Intensity: {props.swirlIntensity}
         </label>
         <input
@@ -352,6 +328,33 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           onChange={handleNumberInput('edgeThicknessPx')}
           className="control-input"
         />
+      </div>
+
+      <div className="control-group">
+        <label className="control-label">
+          Swirl Offset: {props.swirlOffset}
+        </label>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={props.swirlOffset ?? 0.0}
+          onChange={handleSliderChange('swirlOffset')}
+          className="control-slider"
+        />
+        <input
+          type="number"
+          min="0"
+          max="1"
+          step="0.01"
+          value={props.swirlOffset ?? 0.0}
+          onChange={handleNumberInput('swirlOffset')}
+          className="control-input"
+        />
+        <small style={{ display: 'block', marginTop: '0.25rem', color: '#888', fontSize: '0.85rem' }}>
+          0.0 = no gap (edges), 1.0 = max gap (center)
+        </small>
       </div>
 
       <div className="control-group">
@@ -573,11 +576,11 @@ function generateCode(props: LiquidGlassProps): string {
         brightness: 1.05,
         saturation: 1.1,
         shadowIntensity: 0.25,
-        elasticity: 0.6,
         swirlIntensity: 8,
         swirlScale: 1.0,
         swirlRadius: 1.0,
         edgeThicknessPx: 12,
+        swirlOffset: 0.0,
         zIndex: 9999,
         shiningIntensity: 0.8,
       };

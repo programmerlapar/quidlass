@@ -9,7 +9,7 @@ A beautiful liquid glassmorphism React component with customizable effects. Crea
 ## Features
 
 - 🎨 **Liquid Glassmorphism Effect** - Beautiful glass-like surfaces with liquid distortion
-- 🎛️ **Highly Customizable** - 15+ props to fine-tune the appearance
+- 🎛️ **Highly Customizable** - 18+ props to fine-tune the appearance
 - 🚀 **Performance Optimized** - Uses canvas and SVG filters for efficient rendering
 - 📦 **Zero Dependencies** - No external dependencies besides React
 - 🎯 **TypeScript Support** - Full TypeScript definitions included
@@ -67,11 +67,11 @@ const props: LiquidGlassProps = {
 | `brightness` | `number` | `1.05` | Brightness multiplier |
 | `saturation` | `number` | `1.1` | Saturation multiplier |
 | `shadowIntensity` | `number` | `0.25` | Shadow opacity |
-| `elasticity` | `number` | `0.6` | Elasticity factor shaping liquid distortion |
 | `swirlIntensity` | `number` | `8` | Swirl intensity for vortex effect |
 | `swirlScale` | `number` | `1.0` | Swirl scale controls size/zoom |
 | `swirlRadius` | `number` | `1.0` | Swirl radius controls extent |
 | `edgeThicknessPx` | `number` | `12` | Edge thickness in pixels |
+| `swirlOffset` | `number` | `0.0` | Swirl offset: 0.0 = no gap (edges), 1.0 = max gap (center). Controls gap between component edges and swirl effect band |
 | `swirlEdges` | `'all' | 'top-left' | 'top-right' | 'bottom-right' | 'bottom-left' | Array<...>` | `'all'` | Which edge regions get swirl. Can be a single value or an array for multiple regions |
 | `zIndex` | `number` | `9999` | Z-index for layering |
 | `textShadow` | `boolean \| string` | `true` | Text shadow for content |
@@ -169,6 +169,18 @@ Check out the interactive demo with 6 different use cases (Button, Floating Butt
   swirlEdges={['top-left', 'bottom-right']}
 >
   <div>Swirl effect only on top-left and bottom-right corners</div>
+</LiquidGlass>
+```
+
+### Swirl Offset (Gap Control)
+
+```tsx
+<LiquidGlass 
+  borderRadius={20} 
+  blur={8}
+  swirlOffset={0.3}
+>
+  <div>Swirl effect with gap from edges (30% of distance to center)</div>
 </LiquidGlass>
 ```
 
