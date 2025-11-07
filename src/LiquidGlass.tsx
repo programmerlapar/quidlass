@@ -116,9 +116,110 @@ export interface LiquidGlassProps {
 	 */
 	shiningIntensity?: number;
 	/**
+	 * Elasticity factor controls how much the component responds to mouse position
+	 * Higher values create stronger stretching and translation effects
+	 * The component will stretch toward the mouse and translate slightly
+	 * @default 0.15
+	 */
+	elasticity?: number;
+	/**
+	 * Global mouse position from external source
+	 * If provided, component will use this instead of internal tracking
+	 * @default undefined
+	 */
+	globalMousePos?: { x: number; y: number };
+	/**
+	 * Mouse offset relative to component center (percentage)
+	 * If provided, component will use this instead of calculating from globalMousePos
+	 * @default undefined
+	 */
+	mouseOffset?: { x: number; y: number };
+	/**
+	 * Container ref for mouse tracking
+	 * If provided, mouse tracking will be relative to this container
+	 * @default undefined
+	 */
+	mouseContainer?: React.RefObject<HTMLElement | null> | null;
+	/**
+	 * Activation zone in pixels from component edges
+	 * Elasticity effect only applies when mouse is within this distance
+	 * @default 200
+	 */
+	elasticityActivationZone?: number;
+	/**
+	 * Enable press state tracking for tactile feedback
+	 * When enabled, component responds to press/release interactions
+	 * @default false
+	 */
+	enablePressState?: boolean;
+	/**
+	 * Enable scroll-based adaptive properties
+	 * When enabled, blur, saturation, and opacity adapt based on scroll position
+	 * @default false
+	 */
+	enableScrollAdaptation?: boolean;
+	/**
+	 * Scroll container selector or ref for scroll-based adaptation
+	 * If not provided, will attempt to find scrollable parent
+	 * @default undefined
+	 */
+	scrollContainer?: string | React.RefObject<HTMLElement | null>;
+	/**
+	 * Enable interactive inner glow effect at touch/mouse point
+	 * Creates a radial glow that follows interaction point
+	 * @default false
+	 */
+	enableInnerGlow?: boolean;
+	/**
+	 * Enable morphic transitions (expand/collapse)
+	 * When enabled, component can smoothly morph between sizes
+	 * @default false
+	 */
+	enableMorphicTransitions?: boolean;
+	/**
+	 * Expanded state for morphic transitions
+	 * When true, component uses expanded dimensions
+	 * @default false
+	 */
+	isExpanded?: boolean;
+	/**
+	 * Expanded width in pixels (used when isExpanded is true)
+	 * @default 400
+	 */
+	expandedWidth?: number | string;
+	/**
+	 * Expanded height in pixels (used when isExpanded is true)
+	 * @default 320
+	 */
+	expandedHeight?: number | string;
+	/**
+	 * Collapsed width in pixels (used when isExpanded is false)
+	 * @default undefined (uses container width)
+	 */
+	collapsedWidth?: number | string;
+	/**
+	 * Collapsed height in pixels (used when isExpanded is false)
+	 * @default undefined (uses container height)
+	 */
+	collapsedHeight?: number | string;
+	/**
+	 * Callback fired when press state changes
+	 * @param isPressed - Current press state
+	 */
+	onPressStateChange?: (isPressed: boolean) => void;
+	/**
+	 * Callback fired when component is clicked (for toggle expand/collapse)
+	 * @param event - Mouse event
+	 */
+	onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+	/**
 	 * Additional CSS classes to apply to the container
 	 */
 	className?: string;
+	/**
+	 * Additional inline styles to apply to the container
+	 */
+	style?: React.CSSProperties;
 	/**
 	 * Child elements to render inside the glass container
 	 */
@@ -153,11 +254,29 @@ export interface LiquidGlassProps {
 	 * @param zIndex - Z-index for layering (default: 9999)
 	 * @param textShadow - Text shadow for text inside (default: true, or custom CSS value)
 	 * @param textColor - Text color for text inside (default: 'rgb(255, 255, 255)', any valid CSS color)
-	 * @param tintColor - Tint color for the glass overlay (default: undefined, any valid CSS color)
-	 * @param shiningBorder - Enable shining glass effect on borders (default: false)
-	 * @param shiningIntensity - Intensity of shining effect 0.0-1.0 (default: 0.8)
-	 * @param className - Additional CSS classes
-	 * @param children - Content to render inside the glass container
+ * @param tintColor - Tint color for the glass overlay (default: undefined, any valid CSS color)
+ * @param shiningBorder - Enable shining glass effect on borders (default: false)
+ * @param shiningIntensity - Intensity of shining effect 0.0-1.0 (default: 0.8)
+ * @param elasticity - Elasticity factor for mouse interaction (default: 0.15)
+ * @param globalMousePos - External global mouse position (default: undefined)
+ * @param mouseOffset - External mouse offset relative to center (default: undefined)
+ * @param mouseContainer - Container ref for mouse tracking (default: undefined)
+ * @param elasticityActivationZone - Activation zone in pixels from edges (default: 200)
+ * @param enablePressState - Enable press state tracking for tactile feedback (default: false)
+ * @param enableScrollAdaptation - Enable scroll-based adaptive properties (default: false)
+ * @param scrollContainer - Scroll container selector or ref for scroll-based adaptation (default: undefined)
+ * @param enableInnerGlow - Enable interactive inner glow effect at touch/mouse point (default: false)
+ * @param enableMorphicTransitions - Enable morphic transitions (expand/collapse) (default: false)
+ * @param isExpanded - Expanded state for morphic transitions (default: false)
+ * @param expandedWidth - Expanded width in pixels (default: 400)
+ * @param expandedHeight - Expanded height in pixels (default: 320)
+ * @param collapsedWidth - Collapsed width in pixels (default: undefined, uses container width)
+ * @param collapsedHeight - Collapsed height in pixels (default: undefined, uses container height)
+ * @param onPressStateChange - Callback fired when press state changes (default: undefined)
+ * @param onClick - Callback fired when component is clicked (default: undefined)
+ * @param className - Additional CSS classes
+ * @param style - Additional inline styles
+ * @param children - Content to render inside the glass container
  * 
  * @example
  * ```tsx
@@ -185,7 +304,25 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	tintColor,
 	shiningBorder = false,
 	shiningIntensity = 0.8,
+	elasticity = 0.15,
+	globalMousePos: externalGlobalMousePos,
+	mouseOffset: externalMouseOffset,
+	mouseContainer = null,
+	elasticityActivationZone = 200,
+	enablePressState = false,
+	enableScrollAdaptation = false,
+	scrollContainer,
+	enableInnerGlow = false,
+	enableMorphicTransitions = false,
+	isExpanded: externalIsExpanded = false,
+	expandedWidth = 400,
+	expandedHeight = 320,
+	collapsedWidth,
+	collapsedHeight,
+	onPressStateChange,
+	onClick,
 	className = '',
+	style = {},
 	children,
 }) => {
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -201,7 +338,39 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	const [height, setHeight] = useState(200);
 	const lastSizeRef = useRef({ width: 300, height: 200 });
 
+	// Elasticity state
+	const [internalGlobalMousePos, setInternalGlobalMousePos] = useState<{ x: number; y: number } | null>(null);
+	const [internalMouseOffset, setInternalMouseOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+	const rafIdRef = useRef<number | null>(null);
+
+	// Press state tracking
+	const [isPressed, setIsPressed] = useState(false);
+	const [touchPoint, setTouchPoint] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+	// Initialize touch point to center when component mounts
+	useEffect(() => {
+		if (enableInnerGlow && containerRef.current) {
+			const rect = containerRef.current.getBoundingClientRect();
+			setTouchPoint({ x: rect.width / 2, y: rect.height / 2 });
+		}
+	}, [enableInnerGlow]);
+
+	// Scroll-based adaptation state
+	const [scrollY, setScrollY] = useState(0);
+
+	// Internal expanded state (if not controlled externally)
+	const [internalIsExpanded, setInternalIsExpanded] = useState(false);
+	const isExpanded = enableMorphicTransitions 
+		? (externalIsExpanded !== undefined ? externalIsExpanded : internalIsExpanded)
+		: false;
+
 	const canvasDPI = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
+
+	// Use external mouse position if provided, otherwise use internal
+	const globalMousePos = externalGlobalMousePos || internalGlobalMousePos;
+	// mouseOffset is kept for API compatibility and potential future use
+	const mouseOffset = externalMouseOffset || internalMouseOffset;
+	void mouseOffset; // Suppress unused variable warning - kept for API compatibility
 
 	/**
 	 * Smooth step interpolation function for easing
@@ -214,6 +383,217 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		t = Math.max(0, Math.min(1, (t - a) / (b - a)));
 		return t * t * (3 - 2 * t);
 	}, []);
+
+	/**
+	 * Internal mouse tracking handler
+	 * Calculates mouse position relative to component center
+	 */
+	const handleMouseMove = useCallback(
+		(e: MouseEvent) => {
+			if (rafIdRef.current !== null) return; // Throttle with requestAnimationFrame
+
+			rafIdRef.current = requestAnimationFrame(() => {
+				rafIdRef.current = null;
+
+				const container = mouseContainer?.current || containerRef.current;
+				if (!container) {
+					return;
+				}
+
+				try {
+					const rect = container.getBoundingClientRect();
+					const centerX = rect.left + rect.width / 2;
+					const centerY = rect.top + rect.height / 2;
+
+					setInternalMouseOffset({
+						x: ((e.clientX - centerX) / rect.width) * 100,
+						y: ((e.clientY - centerY) / rect.height) * 100,
+					});
+
+					setInternalGlobalMousePos({
+						x: e.clientX,
+						y: e.clientY,
+					});
+				} catch (error) {
+					// Silently handle errors (e.g., if element is removed)
+					console.warn('Error in mouse tracking:', error);
+				}
+			});
+		},
+		[mouseContainer],
+	);
+
+	/**
+	 * Helper function to calculate fade-in factor based on distance from element edges
+	 * Returns 0 if outside activation zone, 1 at edges, fading linearly
+	 * @returns Fade-in factor (0-1)
+	 */
+	const calculateFadeInFactor = useCallback((): number => {
+		if (!globalMousePos || !containerRef.current) {
+			return 0;
+		}
+
+		try {
+			const rect = containerRef.current.getBoundingClientRect();
+			const componentCenterX = rect.left + rect.width / 2;
+			const componentCenterY = rect.top + rect.height / 2;
+			const componentWidth = width;
+			const componentHeight = height;
+
+			// Calculate distance from mouse to component edges (not center)
+			const edgeDistanceX = Math.max(0, Math.abs(globalMousePos.x - componentCenterX) - componentWidth / 2);
+			const edgeDistanceY = Math.max(0, Math.abs(globalMousePos.y - componentCenterY) - componentHeight / 2);
+			const edgeDistance = Math.sqrt(edgeDistanceX * edgeDistanceX + edgeDistanceY * edgeDistanceY);
+
+			// If outside activation zone, no effect
+			if (edgeDistance > elasticityActivationZone) {
+				return 0;
+			}
+
+			// Calculate fade-in factor (1 at edge, 0 at activation zone boundary)
+			return 1 - edgeDistance / elasticityActivationZone;
+		} catch (error) {
+			// Handle errors gracefully
+			console.warn('Error calculating fade-in factor:', error);
+			return 0;
+		}
+	}, [globalMousePos, width, height, elasticityActivationZone]);
+
+	/**
+	 * Calculate directional scaling based on mouse position
+	 * Creates elastic stretching effect that responds to mouse movement
+	 * @returns CSS transform scale string
+	 */
+	const calculateDirectionalScale = useCallback((): string => {
+		if (!globalMousePos || !containerRef.current) {
+			return 'scale(1)';
+		}
+
+		try {
+			const rect = containerRef.current.getBoundingClientRect();
+			const componentCenterX = rect.left + rect.width / 2;
+			const componentCenterY = rect.top + rect.height / 2;
+			const componentWidth = width;
+			const componentHeight = height;
+
+			const deltaX = globalMousePos.x - componentCenterX;
+			const deltaY = globalMousePos.y - componentCenterY;
+
+			// Calculate distance from mouse to component edges (not center)
+			const edgeDistanceX = Math.max(0, Math.abs(deltaX) - componentWidth / 2);
+			const edgeDistanceY = Math.max(0, Math.abs(deltaY) - componentHeight / 2);
+			const edgeDistance = Math.sqrt(edgeDistanceX * edgeDistanceX + edgeDistanceY * edgeDistanceY);
+
+			// If outside activation zone, no effect
+			if (edgeDistance > elasticityActivationZone) {
+				return 'scale(1)';
+			}
+
+			// Calculate fade-in factor (1 at edge, 0 at activation zone boundary)
+			const fadeInFactor = 1 - edgeDistance / elasticityActivationZone;
+
+			// Normalize the deltas for direction
+			const centerDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+			if (centerDistance === 0) {
+				return 'scale(1)';
+			}
+
+			const normalizedX = deltaX / centerDistance;
+			const normalizedY = deltaY / centerDistance;
+
+			// Calculate stretch factors with fade-in
+			const stretchIntensity = Math.min(centerDistance / 300, 1) * elasticity * fadeInFactor;
+
+			// X-axis scaling: stretch horizontally when moving left/right, compress when moving up/down
+			const scaleX = 1 + Math.abs(normalizedX) * stretchIntensity * 0.3 - Math.abs(normalizedY) * stretchIntensity * 0.15;
+
+			// Y-axis scaling: stretch vertically when moving up/down, compress when moving left/right
+			const scaleY = 1 + Math.abs(normalizedY) * stretchIntensity * 0.3 - Math.abs(normalizedX) * stretchIntensity * 0.15;
+
+			return `scaleX(${Math.max(0.8, Math.min(1.2, scaleX))}) scaleY(${Math.max(0.8, Math.min(1.2, scaleY))})`;
+		} catch (error) {
+			// Handle errors gracefully
+			console.warn('Error calculating directional scale:', error);
+			return 'scale(1)';
+		}
+	}, [globalMousePos, elasticity, width, height, elasticityActivationZone]);
+
+	/**
+	 * Calculate elastic translation based on mouse position
+	 * Creates subtle movement toward the mouse cursor
+	 * @returns Translation offset in pixels
+	 */
+	const calculateElasticTranslation = useCallback((): { x: number; y: number } => {
+		if (!globalMousePos || !containerRef.current) {
+			return { x: 0, y: 0 };
+		}
+
+		try {
+			const fadeInFactor = calculateFadeInFactor();
+			const rect = containerRef.current.getBoundingClientRect();
+			const componentCenterX = rect.left + rect.width / 2;
+			const componentCenterY = rect.top + rect.height / 2;
+
+			return {
+				x: (globalMousePos.x - componentCenterX) * elasticity * 0.1 * fadeInFactor,
+				y: (globalMousePos.y - componentCenterY) * elasticity * 0.1 * fadeInFactor,
+			};
+		} catch (error) {
+			// Handle errors gracefully
+			console.warn('Error calculating elastic translation:', error);
+			return { x: 0, y: 0 };
+		}
+	}, [globalMousePos, elasticity, calculateFadeInFactor]);
+
+	/**
+	 * Handle interaction point tracking
+	 * Updates touch point coordinates relative to component
+	 * @param e - Mouse or touch event
+	 */
+	const handleInteraction = useCallback((e: React.MouseEvent<HTMLDivElement> | MouseEvent) => {
+		if (!containerRef.current) return;
+		
+		const rect = containerRef.current.getBoundingClientRect();
+		const x = (e.clientX || (e as MouseEvent).clientX) - rect.left;
+		const y = (e.clientY || (e as MouseEvent).clientY) - rect.top;
+		setTouchPoint({ x, y });
+	}, []);
+
+	/**
+	 * Handle press start
+	 * Sets pressed state and tracks interaction point
+	 * @param e - Mouse event
+	 */
+	const handlePress = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+		if (!enablePressState) return;
+		
+		setIsPressed(true);
+		handleInteraction(e);
+		onPressStateChange?.(true);
+	}, [enablePressState, handleInteraction, onPressStateChange]);
+
+	/**
+	 * Handle press release
+	 * Resets pressed state
+	 */
+	const handleRelease = useCallback(() => {
+		if (!enablePressState) return;
+		
+		setIsPressed(false);
+		onPressStateChange?.(false);
+	}, [enablePressState, onPressStateChange]);
+
+	/**
+	 * Handle click for morphic transitions
+	 * Toggles expanded state if morphic transitions are enabled
+	 * @param e - Mouse event
+	 */
+	const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+		if (enableMorphicTransitions && externalIsExpanded === undefined) {
+			setInternalIsExpanded(prev => !prev);
+		}
+		onClick?.(e);
+	}, [enableMorphicTransitions, externalIsExpanded, onClick]);
 
 	/**
 	 * Calculate the length (magnitude) of a 2D vector
@@ -290,7 +670,6 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		const sdfRadius = borderRadius * canvasDPI;
 		const maxRadius = Math.sqrt(0.5 * 0.5 + 0.5 * 0.5); // Max distance from center
 		const minDimension = Math.min(w, h);
-		const maxDimension = Math.max(w, h);
 		
 		// Make threshold adaptive to component size for small components
 		// CRITICAL: Threshold must never exceed the maximum possible distance from any edge
@@ -346,19 +725,18 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 				const uv = { x: uvX, y: uvY };
 				const ix = uvX - 0.5;
 
-				// Check if pixel is inside the rounded rectangle boundary using SDF
 				const centeredX = pxX - halfW;
 				const centeredY = pxY - halfH;
 				
-				const sdfValue = roundedRectSDF(
+				// Check if pixel is inside the rounded rectangle boundary using SDF
+				// (sdfValue < 0 means inside, but we don't need to store it)
+				roundedRectSDF(
 					centeredX,
 					centeredY,
 					sdfW,
 					sdfH,
 					sdfRadius
 				);
-				
-				const isInsideRoundedRect = sdfValue < 0;
 				
 				// Distance from container edges (straight edges) - not rounded boundary
 				// This ensures swirl effect stays at edges regardless of border radius
@@ -613,6 +991,103 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		updateShader();
 	}, [updateShader]);
 
+	// Set up mouse tracking if no external mouse position is provided
+	useEffect(() => {
+		if (externalGlobalMousePos && externalMouseOffset) {
+			// External mouse tracking is provided, don't set up internal tracking
+			return;
+		}
+
+		const container = mouseContainer?.current || containerRef.current;
+		if (!container) {
+			return;
+		}
+
+		// Only set up mouse tracking if elasticity is enabled (non-zero)
+		if (elasticity === 0) {
+			return;
+		}
+
+		// Mouse leave handler to reset mouse position
+		const handleMouseLeave = () => {
+			setInternalGlobalMousePos(null);
+			setInternalMouseOffset({ x: 0, y: 0 });
+		};
+
+		container.addEventListener('mousemove', handleMouseMove);
+		container.addEventListener('mouseleave', handleMouseLeave);
+
+		return () => {
+			container.removeEventListener('mousemove', handleMouseMove);
+			container.removeEventListener('mouseleave', handleMouseLeave);
+			if (rafIdRef.current !== null) {
+				cancelAnimationFrame(rafIdRef.current);
+				rafIdRef.current = null;
+			}
+		};
+	}, [handleMouseMove, mouseContainer, externalGlobalMousePos, externalMouseOffset, elasticity]);
+
+	// Set up scroll tracking for adaptive properties
+	useEffect(() => {
+		if (!enableScrollAdaptation) return;
+
+		const handleScroll = (e: Event) => {
+			const target = e.target as HTMLElement;
+			if (target) {
+				setScrollY(target.scrollTop || 0);
+			}
+		};
+
+		let scrollElement: HTMLElement | null = null;
+
+		// Find scroll container
+		if (scrollContainer) {
+			if (typeof scrollContainer === 'string') {
+				scrollElement = document.querySelector(scrollContainer);
+			} else if (scrollContainer.current) {
+				scrollElement = scrollContainer.current;
+			}
+		} else {
+			// Try to find scrollable parent
+			let parent = containerRef.current?.parentElement;
+			while (parent) {
+				const style = window.getComputedStyle(parent);
+				if (style.overflowY === 'auto' || style.overflowY === 'scroll' || 
+				    style.overflow === 'auto' || style.overflow === 'scroll') {
+					scrollElement = parent;
+					break;
+				}
+				parent = parent.parentElement;
+			}
+		}
+
+		if (scrollElement) {
+			scrollElement.addEventListener('scroll', handleScroll, { passive: true });
+			// Initialize scroll position
+			setScrollY(scrollElement.scrollTop || 0);
+			
+			return () => {
+				scrollElement?.removeEventListener('scroll', handleScroll);
+			};
+		}
+	}, [enableScrollAdaptation, scrollContainer]);
+
+	// Calculate adaptive properties based on scroll position
+	const adaptiveOpacity = useMemo(() => {
+		if (!enableScrollAdaptation) return undefined;
+		return Math.min(1, 0.7 + (scrollY / 500) * 0.3);
+	}, [enableScrollAdaptation, scrollY]);
+
+	const adaptiveSaturation = useMemo(() => {
+		if (!enableScrollAdaptation) return saturation;
+		return Math.min(1.5, 1 + (scrollY / 300) * 0.5);
+	}, [enableScrollAdaptation, scrollY, saturation]);
+
+	const adaptiveBlur = useMemo(() => {
+		if (!enableScrollAdaptation) return blur;
+		return Math.min(30, 20 + (scrollY / 200) * 10);
+	}, [enableScrollAdaptation, scrollY, blur]);
+
 	// Memoize text shadow value for CSS injection
 	const textShadowValue = useMemo(() => {
 		if (textShadow === false) return 'none';
@@ -622,6 +1097,39 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 
 	// Memoize shining intensity calculations
 	const clampedShiningIntensity = useMemo(() => Math.min(shiningIntensity, 1), [shiningIntensity]);
+
+	// Calculate transform style for elasticity effect and press state
+	const transformStyle = useMemo(() => {
+		let transforms: string[] = [];
+
+		// Press state scaling
+		if (enablePressState && isPressed) {
+			transforms.push('scale(0.98)');
+		}
+
+		// Elasticity effect
+		if (elasticity !== 0 && globalMousePos) {
+			try {
+				const translation = calculateElasticTranslation();
+				const scale = calculateDirectionalScale();
+				transforms.push(`translate(${translation.x}px, ${translation.y}px) ${scale}`);
+			} catch (error) {
+				console.warn('Error calculating transform style:', error);
+			}
+		}
+
+		return transforms.length > 0 ? transforms.join(' ') : undefined;
+	}, [enablePressState, isPressed, elasticity, globalMousePos, calculateElasticTranslation, calculateDirectionalScale]);
+
+	// Calculate morphic transition dimensions
+	const morphicDimensions = useMemo(() => {
+		if (!enableMorphicTransitions) return undefined;
+
+		return {
+			width: isExpanded ? expandedWidth : (collapsedWidth || '100%'),
+			height: isExpanded ? expandedHeight : (collapsedHeight || '100%'),
+		};
+	}, [enableMorphicTransitions, isExpanded, expandedWidth, expandedHeight, collapsedWidth, collapsedHeight]);
 
 	return (
 		<>
@@ -709,13 +1217,26 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 				ref={containerRef}
 				className={className}
 				data-liquid-glass="true"
+				onMouseDown={enablePressState ? handlePress : undefined}
+				onMouseUp={enablePressState ? handleRelease : undefined}
+				onMouseLeave={enablePressState ? handleRelease : undefined}
+				onMouseMove={(enablePressState && isPressed) || enableInnerGlow ? handleInteraction : undefined}
+				onClick={enableMorphicTransitions || onClick ? handleClick : undefined}
 				style={{
 					position: 'relative',
-					width: '100%',
-					height: '100%',
+					width: morphicDimensions?.width || '100%',
+					height: morphicDimensions?.height || '100%',
 					overflow: 'hidden',
 					borderRadius: `${borderRadius}px`,
 					zIndex: zIndex,
+					transform: transformStyle,
+					transition: enableMorphicTransitions 
+						? 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)'
+						: transformStyle 
+							? 'transform 0.2s ease-out' 
+							: undefined,
+					cursor: enablePressState || enableMorphicTransitions ? 'pointer' : undefined,
+					...style,
 				}}
 			>
 				{/* Backdrop layer with blur and displacement filter */}
@@ -727,11 +1248,19 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 						right: 0,
 						bottom: 0,
 						pointerEvents: 'none',
-						backgroundColor: 'rgba(255, 255, 255, 0.02)',
-						backdropFilter: `blur(${blur}px) contrast(${contrast}) brightness(${brightness}) saturate(${saturation})`,
-						WebkitBackdropFilter: `blur(${blur}px) contrast(${contrast}) brightness(${brightness}) saturate(${saturation})`,
+						backgroundColor: enablePressState 
+							? `rgba(255, 255, 255, ${isPressed ? 0.25 : 0.15})`
+							: adaptiveOpacity !== undefined
+								? `rgba(255, 255, 255, ${adaptiveOpacity * 0.15})`
+								: 'rgba(255, 255, 255, 0.02)',
+						backdropFilter: `blur(${adaptiveBlur}px) contrast(${contrast}) brightness(${brightness}) saturate(${adaptiveSaturation})`,
+						WebkitBackdropFilter: `blur(${adaptiveBlur}px) contrast(${contrast}) brightness(${brightness}) saturate(${adaptiveSaturation})`,
 						filter: `url(#${id}_filter)`,
 						borderRadius: `${borderRadius}px`,
+						opacity: adaptiveOpacity !== undefined ? adaptiveOpacity : undefined,
+						transition: enablePressState || enableScrollAdaptation 
+							? 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)' 
+							: undefined,
 					}}
 				/>
 				{/* Soft depth shadow with multiple layers for edge glow */}
@@ -745,14 +1274,35 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 						pointerEvents: 'none',
 						borderRadius: `${borderRadius}px`,
 						boxShadow: `
-							0 2px 8px rgba(0, 0, 0, ${shadowIntensity * 0.4}), 
-							0 4px 16px rgba(0, 0, 0, ${shadowIntensity * 0.3}), 
+							0 2px 8px rgba(0, 0, 0, ${shadowIntensity * (enablePressState && isPressed ? 0.6 : 0.4)}), 
+							0 4px 16px rgba(0, 0, 0, ${shadowIntensity * (enablePressState && isPressed ? 0.45 : 0.3)}), 
 							0 0 0 0.5px rgba(255, 255, 255, 0.08),
 							inset 0 1px 2px rgba(255, 255, 255, 0.1),
 							inset 0 -1px 2px rgba(0, 0, 0, 0.1)
 						`,
+						transform: enablePressState && isPressed ? 'scale(0.95)' : 'scale(1)',
+						transition: enablePressState ? 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)' : undefined,
 					}}
 				/>
+				{/* Elastic shadow that responds to interaction */}
+				{enablePressState && (
+					<div
+						style={{
+							position: 'absolute',
+							top: '-8px',
+							left: '-8px',
+							right: '-8px',
+							bottom: '-8px',
+							pointerEvents: 'none',
+							borderRadius: `${borderRadius + 8}px`,
+							background: 'radial-gradient(circle, rgba(0,0,0,0.4), transparent 70%)',
+							filter: 'blur(20px)',
+							opacity: isPressed ? 0.6 : 0.3,
+							transform: isPressed ? 'scale(0.95)' : 'scale(1)',
+							transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+						}}
+					/>
+				)}
 				{/* Subtle light reflection/sheen overlay on top edges */}
 				<div
 					style={{
@@ -780,6 +1330,25 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 							zIndex: 1,
 							backgroundColor: tintColor,
 							borderRadius: `${borderRadius}px`,
+						}}
+					/>
+				)}
+				{/* Interactive inner glow on interaction */}
+				{enableInnerGlow && (
+					<div
+						style={{
+							position: 'absolute',
+							top: 0,
+							left: 0,
+							right: 0,
+							bottom: 0,
+							pointerEvents: 'none',
+							zIndex: 1,
+							borderRadius: `${borderRadius}px`,
+							background: `radial-gradient(circle at ${touchPoint.x}px ${touchPoint.y}px,
+								rgba(255, 255, 255, ${isPressed ? 0.4 : 0}),
+								transparent 60%)`,
+							transition: 'background 0.2s ease',
 						}}
 					/>
 				)}

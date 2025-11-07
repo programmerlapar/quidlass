@@ -233,6 +233,59 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         />
       </div>
 
+      <div className="control-group">
+        <label className="control-label">
+          Elasticity: {props.elasticity}
+        </label>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={props.elasticity ?? 0.15}
+          onChange={handleSliderChange('elasticity')}
+          className="control-slider"
+        />
+        <input
+          type="number"
+          min="0"
+          max="1"
+          step="0.01"
+          value={props.elasticity ?? 0.15}
+          onChange={handleNumberInput('elasticity')}
+          className="control-input"
+        />
+        <small style={{ display: 'block', marginTop: '0.25rem', color: '#888', fontSize: '0.85rem' }}>
+          Controls how much the component responds to mouse position (stretching and translation)
+        </small>
+      </div>
+
+      <div className="control-group">
+        <label className="control-label">
+          Elasticity Activation Zone: {props.elasticityActivationZone ?? 200}px
+        </label>
+        <input
+          type="range"
+          min="0"
+          max="500"
+          step="10"
+          value={props.elasticityActivationZone ?? 200}
+          onChange={handleSliderChange('elasticityActivationZone')}
+          className="control-slider"
+        />
+        <input
+          type="number"
+          min="0"
+          max="500"
+          step="10"
+          value={props.elasticityActivationZone ?? 200}
+          onChange={handleNumberInput('elasticityActivationZone')}
+          className="control-input"
+        />
+        <small style={{ display: 'block', marginTop: '0.25rem', color: '#888', fontSize: '0.85rem' }}>
+          Distance from component edges where elasticity effect activates
+        </small>
+      </div>
 
       <div className="control-group">
         <label className="control-label">
@@ -543,6 +596,180 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           />
         </div>
       )}
+
+      {/* New Interactive Features Section */}
+      <div className="control-group" style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid #333' }}>
+        <h3 style={{ marginBottom: '1rem', color: '#fff', fontSize: '1.1rem' }}>Interactive Features</h3>
+      </div>
+
+      <div className="control-group">
+        <label className="control-label">
+          <input
+            type="checkbox"
+            checked={props.enablePressState || false}
+            onChange={handleCheckboxChange('enablePressState')}
+            className="control-checkbox"
+          />
+          Enable Press State
+        </label>
+        <small style={{ display: 'block', marginTop: '0.25rem', color: '#888', fontSize: '0.85rem' }}>
+          Component responds to press/release interactions with tactile feedback
+        </small>
+      </div>
+
+      <div className="control-group">
+        <label className="control-label">
+          <input
+            type="checkbox"
+            checked={props.enableInnerGlow || false}
+            onChange={handleCheckboxChange('enableInnerGlow')}
+            className="control-checkbox"
+          />
+          Enable Inner Glow
+        </label>
+        <small style={{ display: 'block', marginTop: '0.25rem', color: '#888', fontSize: '0.85rem' }}>
+          Interactive radial glow effect that follows touch/mouse point
+        </small>
+      </div>
+
+      <div className="control-group">
+        <label className="control-label">
+          <input
+            type="checkbox"
+            checked={props.enableScrollAdaptation || false}
+            onChange={handleCheckboxChange('enableScrollAdaptation')}
+            className="control-checkbox"
+          />
+          Enable Scroll Adaptation
+        </label>
+        <small style={{ display: 'block', marginTop: '0.25rem', color: '#888', fontSize: '0.85rem' }}>
+          Blur, saturation, and opacity adapt based on scroll position
+        </small>
+      </div>
+
+      {props.enableScrollAdaptation && (
+        <div className="control-group">
+          <label className="control-label">Scroll Container</label>
+          <input
+            type="text"
+            value={typeof props.scrollContainer === 'string' ? props.scrollContainer : ''}
+            onChange={(e) => onPropChange('scrollContainer', e.target.value || undefined)}
+            placeholder="e.g., #scroll-content or leave empty for auto-detect"
+            className="control-input"
+            style={{ marginTop: '0.5rem' }}
+          />
+          <small style={{ display: 'block', marginTop: '0.25rem', color: '#888', fontSize: '0.85rem' }}>
+            CSS selector for scroll container (leave empty to auto-detect scrollable parent)
+          </small>
+        </div>
+      )}
+
+      <div className="control-group">
+        <label className="control-label">
+          <input
+            type="checkbox"
+            checked={props.enableMorphicTransitions || false}
+            onChange={handleCheckboxChange('enableMorphicTransitions')}
+            className="control-checkbox"
+          />
+          Enable Morphic Transitions
+        </label>
+        <small style={{ display: 'block', marginTop: '0.25rem', color: '#888', fontSize: '0.85rem' }}>
+          Smooth size morphing with expand/collapse functionality
+        </small>
+      </div>
+
+      {props.enableMorphicTransitions && (
+        <>
+          <div className="control-group">
+            <label className="control-label">
+              <input
+                type="checkbox"
+                checked={props.isExpanded || false}
+                onChange={handleCheckboxChange('isExpanded')}
+                className="control-checkbox"
+              />
+              Is Expanded
+            </label>
+          </div>
+
+          <div className="control-group">
+            <label className="control-label">
+              Expanded Width: {typeof props.expandedWidth === 'number' ? `${props.expandedWidth}px` : props.expandedWidth || '400px'}
+            </label>
+            <input
+              type="text"
+              value={props.expandedWidth || 400}
+              onChange={(e) => {
+                const value = e.target.value;
+                const numValue = parseFloat(value);
+                onPropChange('expandedWidth', isNaN(numValue) ? value : numValue);
+              }}
+              placeholder="400 or 400px"
+              className="control-input"
+            />
+          </div>
+
+          <div className="control-group">
+            <label className="control-label">
+              Expanded Height: {typeof props.expandedHeight === 'number' ? `${props.expandedHeight}px` : props.expandedHeight || '320px'}
+            </label>
+            <input
+              type="text"
+              value={props.expandedHeight || 320}
+              onChange={(e) => {
+                const value = e.target.value;
+                const numValue = parseFloat(value);
+                onPropChange('expandedHeight', isNaN(numValue) ? value : numValue);
+              }}
+              placeholder="320 or 320px"
+              className="control-input"
+            />
+          </div>
+
+          <div className="control-group">
+            <label className="control-label">
+              Collapsed Width: {typeof props.collapsedWidth === 'number' ? `${props.collapsedWidth}px` : props.collapsedWidth || 'auto'}
+            </label>
+            <input
+              type="text"
+              value={props.collapsedWidth || ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (!value) {
+                  onPropChange('collapsedWidth', undefined);
+                  return;
+                }
+                const numValue = parseFloat(value);
+                onPropChange('collapsedWidth', isNaN(numValue) ? value : numValue);
+              }}
+              placeholder="280 or 280px (leave empty for auto)"
+              className="control-input"
+            />
+          </div>
+
+          <div className="control-group">
+            <label className="control-label">
+              Collapsed Height: {typeof props.collapsedHeight === 'number' ? `${props.collapsedHeight}px` : props.collapsedHeight || 'auto'}
+            </label>
+            <input
+              type="text"
+              value={props.collapsedHeight || ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (!value) {
+                  onPropChange('collapsedHeight', undefined);
+                  return;
+                }
+                const numValue = parseFloat(value);
+                onPropChange('collapsedHeight', isNaN(numValue) ? value : numValue);
+              }}
+              placeholder="80 or 80px (leave empty for auto)"
+              className="control-input"
+            />
+          </div>
+        </>
+      )}
         </>
       )}
     </div>
@@ -564,6 +791,9 @@ function generateCode(props: LiquidGlassProps): string {
       // For tintColor and textColor, use curly braces for CSS color values
       if (key === 'tintColor' || key === 'textColor') {
         propsArray.push(`  ${key}={${JSON.stringify(value)}}`);
+      } else if (key === 'scrollContainer') {
+        // For scrollContainer, check if it's a string selector
+        propsArray.push(`  ${key}="${value}"`);
       } else {
         propsArray.push(`  ${key}="${value}"`);
       }
@@ -576,6 +806,8 @@ function generateCode(props: LiquidGlassProps): string {
         brightness: 1.05,
         saturation: 1.1,
         shadowIntensity: 0.25,
+        elasticity: 0.15,
+        elasticityActivationZone: 200,
         swirlIntensity: 8,
         swirlScale: 1.0,
         swirlRadius: 1.0,
@@ -583,9 +815,18 @@ function generateCode(props: LiquidGlassProps): string {
         swirlOffset: 0.0,
         zIndex: 9999,
         shiningIntensity: 0.8,
+        expandedWidth: 400,
+        expandedHeight: 320,
       };
       
       if (defaults[key] !== value) {
+        propsArray.push(`  ${key}={${value}}`);
+      }
+    } else if (key === 'expandedWidth' || key === 'expandedHeight' || key === 'collapsedWidth' || key === 'collapsedHeight') {
+      // Handle string or number for morphic transition dimensions
+      if (typeof value === 'string') {
+        propsArray.push(`  ${key}="${value}"`);
+      } else {
         propsArray.push(`  ${key}={${value}}`);
       }
     }
