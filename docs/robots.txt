@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://programmerlapar.github.io/quidlass/sitemap.xml

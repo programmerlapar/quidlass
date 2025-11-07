@@ -2,6 +2,9 @@
 
 A beautiful liquid glassmorphism React component with customizable effects. Create stunning glass-like surfaces with liquid distortion effects, perfect for modern UI designs.
 
+- Documentation: https://programmerlapar.github.io/quidlass/
+- Live Demo: https://programmerlapar.github.io/quidlass/demo/
+
 
 ## Features
 
