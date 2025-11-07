@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quidlass – Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.1/github-markdown.min.css">
+    <style>
+      body { margin: 0; padding: 0; }
+      .container { max-width: 980px; margin: 0 auto; padding: 2rem; }
+      .markdown-body { box-sizing: border-box; min-width: 200px; }
+      .topnav { font: 600 14px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, sans-serif; padding: 12px 16px; border-bottom: 1px solid #eaecef; display: flex; gap: 12px; align-items: center; }
+      .topnav a { color: #0969da; text-decoration: none; }
+      .topnav a:hover { text-decoration: underline; }
+      .spacer { flex: 1; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  </head>
+  <body>
+    <div class="topnav">
+      <a href="./">Quidlass</a>
+      <a href="./demo/">Demo</a>
+      <span class="spacer"></span>
+      <a href="https://github.com/programmerlapar/quidlass">GitHub</a>
+    </div>
+    <div class="container">
+      <article id="content" class="markdown-body">Loading…</article>
+    </div>
+    <script>
+      async function load() {
+        try {
+          const res = await fetch('./README.md');
+          if (!res.ok) throw new Error('Failed to load README.md');
+          const md = await res.text();
+          const html = marked.parse(md);
+          document.getElementById('content').innerHTML = html;
+        } catch (e) {
+          document.getElementById('content').textContent = 'Failed to render documentation.';
+          console.error(e);
+        }
+      }
+      load();
+    </script>
+  </body>
+  </html>
+

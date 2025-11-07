@@ -42,9 +42,8 @@ jobs:
       - name: Build demo
         run: cd demo && yarn install --frozen-lockfile && yarn build
 
-      - name: Set README as homepage
-        run: |
-          cp README.md docs/index.md
+      - name: Copy README into docs
+        run: cp README.md docs/README.md
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

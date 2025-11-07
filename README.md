@@ -81,7 +81,10 @@ const props: LiquidGlassProps = {
 
 ## Demo
 
-Check out the interactive demo with 6 different use cases (Button, Floating Button, Card, Tooltip, Popup, Modal) and real-time prop controls. See the `demo` folder for the demo application.
+Check out the interactive demo with 6 different use cases (Button, Floating Button, Card, Tooltip, Popup, Modal) and real-time prop controls.
+
+- Live demo: https://programmerlapar.github.io/quidlass/demo
+- Source: see the `demo` folder in this repo
 
 ## Examples
 
@@ -203,4 +206,3 @@ If you find this project helpful, consider buying me a coffee! ☕
 [![PayPal](https://img.shields.io/badge/PayPal-Support-blue?logo=paypal)](https://www.paypal.com/paypalme/programmerlapar)
 
 [Support via PayPal](https://www.paypal.com/paypalme/programmerlapar)
-
