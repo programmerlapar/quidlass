@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-11-09
+
+### Performance
+- **Bundle Size Optimization**: Reduced bundle size from ~48KB to ~43KB (~10% reduction)
+- **NPM Package Size Reduction**: Reduced NPM package size from ~290KB to ~109KB (~62% reduction)
+- **Code Simplification**: Removed unnecessary memoization and redundant calculations
+- **Source Maps Exclusion**: Excluded source maps from NPM package (still generated for local debugging)
+
+### Changed
+- Removed unnecessary `useCallback` and `useMemo` hooks for simple calculations
+- Consolidated redundant calculations (merged `calculateFadeInFactor` into `getComponentBounds`)
+- Removed unused variables (`mouseOffset`, `internalMouseOffset`)
+- Removed console.warn/error calls to reduce bundle size
+- Simplified conditional logic and removed unnecessary try-catch blocks
+- Updated `package.json` files field to explicitly list files (excluding source maps)
+
+### Technical
+- Optimized React hooks usage (removed over-memoization)
+- Improved code maintainability by simplifying complex logic
+- Reduced unnecessary error handling overhead
+
 ## [1.1.0] - 2025-11-07
 
 ### Added
@@ -57,6 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[1.2.0]: https://github.com/programmerlapar/quidlass/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/programmerlapar/quidlass/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/programmerlapar/quidlass/releases/tag/v1.0.0
 
