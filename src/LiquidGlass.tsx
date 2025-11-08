@@ -340,7 +340,6 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 
 	// Elasticity state
 	const [internalGlobalMousePos, setInternalGlobalMousePos] = useState<{ x: number; y: number } | null>(null);
-	const [internalMouseOffset, setInternalMouseOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 	const rafIdRef = useRef<number | null>(null);
 
 	// Press state tracking
@@ -368,9 +367,6 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 
 	// Use external mouse position if provided, otherwise use internal
 	const globalMousePos = externalGlobalMousePos || internalGlobalMousePos;
-	// mouseOffset is kept for API compatibility and potential future use
-	const mouseOffset = externalMouseOffset || internalMouseOffset;
-	void mouseOffset; // Suppress unused variable warning - kept for API compatibility
 
 	/**
 	 * Smooth step interpolation function for easing
@@ -379,10 +375,10 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	 * @param t - Interpolation value (0-1)
 	 * @returns Interpolated value between a and b
 	 */
-	const smoothStep = useCallback((a: number, b: number, t: number) => {
+	const smoothStep = (a: number, b: number, t: number) => {
 		t = Math.max(0, Math.min(1, (t - a) / (b - a)));
 		return t * t * (3 - 2 * t);
-	}, []);
+	};
 
 	/**
 	 * Internal mouse tracking handler
@@ -400,63 +396,44 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 					return;
 				}
 
-				try {
-					const rect = container.getBoundingClientRect();
-					const centerX = rect.left + rect.width / 2;
-					const centerY = rect.top + rect.height / 2;
-
-					setInternalMouseOffset({
-						x: ((e.clientX - centerX) / rect.width) * 100,
-						y: ((e.clientY - centerY) / rect.height) * 100,
-					});
-
-					setInternalGlobalMousePos({
-						x: e.clientX,
-						y: e.clientY,
-					});
-				} catch (error) {
-					// Silently handle errors (e.g., if element is removed)
-					console.warn('Error in mouse tracking:', error);
-				}
+				setInternalGlobalMousePos({
+					x: e.clientX,
+					y: e.clientY,
+				});
 			});
 		},
 		[mouseContainer],
 	);
 
 	/**
-	 * Helper function to calculate fade-in factor based on distance from element edges
-	 * Returns 0 if outside activation zone, 1 at edges, fading linearly
-	 * @returns Fade-in factor (0-1)
+	 * Helper function to calculate fade-in factor and component bounds
+	 * Returns fade-in factor (0-1) and component bounds
+	 * @returns Object with fadeInFactor and component bounds, or null if invalid
 	 */
-	const calculateFadeInFactor = useCallback((): number => {
+	const getComponentBounds = useCallback((): { fadeInFactor: number; centerX: number; centerY: number } | null => {
 		if (!globalMousePos || !containerRef.current) {
-			return 0;
+			return null;
 		}
 
-		try {
-			const rect = containerRef.current.getBoundingClientRect();
-			const componentCenterX = rect.left + rect.width / 2;
-			const componentCenterY = rect.top + rect.height / 2;
-			const componentWidth = width;
-			const componentHeight = height;
+		const rect = containerRef.current.getBoundingClientRect();
+		const componentCenterX = rect.left + rect.width / 2;
+		const componentCenterY = rect.top + rect.height / 2;
+		const componentWidth = width;
+		const componentHeight = height;
 
-			// Calculate distance from mouse to component edges (not center)
-			const edgeDistanceX = Math.max(0, Math.abs(globalMousePos.x - componentCenterX) - componentWidth / 2);
-			const edgeDistanceY = Math.max(0, Math.abs(globalMousePos.y - componentCenterY) - componentHeight / 2);
-			const edgeDistance = Math.sqrt(edgeDistanceX * edgeDistanceX + edgeDistanceY * edgeDistanceY);
+		// Calculate distance from mouse to component edges (not center)
+		const edgeDistanceX = Math.max(0, Math.abs(globalMousePos.x - componentCenterX) - componentWidth / 2);
+		const edgeDistanceY = Math.max(0, Math.abs(globalMousePos.y - componentCenterY) - componentHeight / 2);
+		const edgeDistance = Math.sqrt(edgeDistanceX * edgeDistanceX + edgeDistanceY * edgeDistanceY);
 
-			// If outside activation zone, no effect
-			if (edgeDistance > elasticityActivationZone) {
-				return 0;
-			}
-
-			// Calculate fade-in factor (1 at edge, 0 at activation zone boundary)
-			return 1 - edgeDistance / elasticityActivationZone;
-		} catch (error) {
-			// Handle errors gracefully
-			console.warn('Error calculating fade-in factor:', error);
-			return 0;
+		// If outside activation zone, no effect
+		if (edgeDistance > elasticityActivationZone) {
+			return null;
 		}
+
+		// Calculate fade-in factor (1 at edge, 0 at activation zone boundary)
+		const fadeInFactor = 1 - edgeDistance / elasticityActivationZone;
+		return { fadeInFactor, centerX: componentCenterX, centerY: componentCenterY };
 	}, [globalMousePos, width, height, elasticityActivationZone]);
 
 	/**
@@ -465,58 +442,34 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	 * @returns CSS transform scale string
 	 */
 	const calculateDirectionalScale = useCallback((): string => {
-		if (!globalMousePos || !containerRef.current) {
+		const bounds = getComponentBounds();
+		if (!bounds) {
 			return 'scale(1)';
 		}
 
-		try {
-			const rect = containerRef.current.getBoundingClientRect();
-			const componentCenterX = rect.left + rect.width / 2;
-			const componentCenterY = rect.top + rect.height / 2;
-			const componentWidth = width;
-			const componentHeight = height;
+		const deltaX = globalMousePos!.x - bounds.centerX;
+		const deltaY = globalMousePos!.y - bounds.centerY;
 
-			const deltaX = globalMousePos.x - componentCenterX;
-			const deltaY = globalMousePos.y - componentCenterY;
-
-			// Calculate distance from mouse to component edges (not center)
-			const edgeDistanceX = Math.max(0, Math.abs(deltaX) - componentWidth / 2);
-			const edgeDistanceY = Math.max(0, Math.abs(deltaY) - componentHeight / 2);
-			const edgeDistance = Math.sqrt(edgeDistanceX * edgeDistanceX + edgeDistanceY * edgeDistanceY);
-
-			// If outside activation zone, no effect
-			if (edgeDistance > elasticityActivationZone) {
-				return 'scale(1)';
-			}
-
-			// Calculate fade-in factor (1 at edge, 0 at activation zone boundary)
-			const fadeInFactor = 1 - edgeDistance / elasticityActivationZone;
-
-			// Normalize the deltas for direction
-			const centerDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-			if (centerDistance === 0) {
-				return 'scale(1)';
-			}
-
-			const normalizedX = deltaX / centerDistance;
-			const normalizedY = deltaY / centerDistance;
-
-			// Calculate stretch factors with fade-in
-			const stretchIntensity = Math.min(centerDistance / 300, 1) * elasticity * fadeInFactor;
-
-			// X-axis scaling: stretch horizontally when moving left/right, compress when moving up/down
-			const scaleX = 1 + Math.abs(normalizedX) * stretchIntensity * 0.3 - Math.abs(normalizedY) * stretchIntensity * 0.15;
-
-			// Y-axis scaling: stretch vertically when moving up/down, compress when moving left/right
-			const scaleY = 1 + Math.abs(normalizedY) * stretchIntensity * 0.3 - Math.abs(normalizedX) * stretchIntensity * 0.15;
-
-			return `scaleX(${Math.max(0.8, Math.min(1.2, scaleX))}) scaleY(${Math.max(0.8, Math.min(1.2, scaleY))})`;
-		} catch (error) {
-			// Handle errors gracefully
-			console.warn('Error calculating directional scale:', error);
+		// Normalize the deltas for direction
+		const centerDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+		if (centerDistance === 0) {
 			return 'scale(1)';
 		}
-	}, [globalMousePos, elasticity, width, height, elasticityActivationZone]);
+
+		const normalizedX = deltaX / centerDistance;
+		const normalizedY = deltaY / centerDistance;
+
+		// Calculate stretch factors with fade-in
+		const stretchIntensity = Math.min(centerDistance / 300, 1) * elasticity * bounds.fadeInFactor;
+
+		// X-axis scaling: stretch horizontally when moving left/right, compress when moving up/down
+		const scaleX = 1 + Math.abs(normalizedX) * stretchIntensity * 0.3 - Math.abs(normalizedY) * stretchIntensity * 0.15;
+
+		// Y-axis scaling: stretch vertically when moving up/down, compress when moving left/right
+		const scaleY = 1 + Math.abs(normalizedY) * stretchIntensity * 0.3 - Math.abs(normalizedX) * stretchIntensity * 0.15;
+
+		return `scaleX(${Math.max(0.8, Math.min(1.2, scaleX))}) scaleY(${Math.max(0.8, Math.min(1.2, scaleY))})`;
+	}, [globalMousePos, elasticity, getComponentBounds]);
 
 	/**
 	 * Calculate elastic translation based on mouse position
@@ -524,26 +477,16 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	 * @returns Translation offset in pixels
 	 */
 	const calculateElasticTranslation = useCallback((): { x: number; y: number } => {
-		if (!globalMousePos || !containerRef.current) {
+		const bounds = getComponentBounds();
+		if (!bounds) {
 			return { x: 0, y: 0 };
 		}
 
-		try {
-			const fadeInFactor = calculateFadeInFactor();
-			const rect = containerRef.current.getBoundingClientRect();
-			const componentCenterX = rect.left + rect.width / 2;
-			const componentCenterY = rect.top + rect.height / 2;
-
-			return {
-				x: (globalMousePos.x - componentCenterX) * elasticity * 0.1 * fadeInFactor,
-				y: (globalMousePos.y - componentCenterY) * elasticity * 0.1 * fadeInFactor,
-			};
-		} catch (error) {
-			// Handle errors gracefully
-			console.warn('Error calculating elastic translation:', error);
-			return { x: 0, y: 0 };
-		}
-	}, [globalMousePos, elasticity, calculateFadeInFactor]);
+		return {
+			x: (globalMousePos!.x - bounds.centerX) * elasticity * 0.1 * bounds.fadeInFactor,
+			y: (globalMousePos!.y - bounds.centerY) * elasticity * 0.1 * bounds.fadeInFactor,
+		};
+	}, [globalMousePos, elasticity, getComponentBounds]);
 
 	/**
 	 * Handle interaction point tracking
@@ -601,9 +544,7 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	 * @param y - Y component
 	 * @returns Vector length
 	 */
-	const length = useCallback((x: number, y: number) => {
-		return Math.sqrt(x * x + y * y);
-	}, []);
+	const length = (x: number, y: number) => Math.sqrt(x * x + y * y);
 
 	/**
 	 * Calculate signed distance field (SDF) for a rounded rectangle
@@ -615,18 +556,15 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	 * @param radius - Corner radius
 	 * @returns Signed distance value
 	 */
-	const roundedRectSDF = useCallback(
-		(x: number, y: number, w: number, h: number, radius: number) => {
-			const qx = Math.abs(x) - w + radius;
-			const qy = Math.abs(y) - h + radius;
-			return (
-				Math.min(Math.max(qx, qy), 0) +
-				length(Math.max(qx, 0), Math.max(qy, 0)) -
-				radius
-			);
-		},
-		[length],
-	);
+	const roundedRectSDF = (x: number, y: number, w: number, h: number, radius: number) => {
+		const qx = Math.abs(x) - w + radius;
+		const qy = Math.abs(y) - h + radius;
+		return (
+			Math.min(Math.max(qx, qy), 0) +
+			length(Math.max(qx, 0), Math.max(qy, 0)) -
+			radius
+		);
+	};
 
 	/**
 	 * Update the shader displacement map based on current dimensions and parameters
@@ -888,43 +826,24 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		// Ensure data length is correct for ImageData
 		const expectedLength = w * h * 4;
 		if (data.length !== expectedLength) {
-			console.warn(
-				'Data length mismatch for ImageData:',
-				data.length,
-				'expected:',
-				expectedLength,
-			);
 			return;
 		}
 
-		try {
-			context.putImageData(new ImageData(data, w, h), 0, 0);
-			feImage.setAttributeNS(
-				'http://www.w3.org/1999/xlink',
-				'href',
-				canvas.toDataURL(),
-			);
-			// Set the SVG filter scale to use the displacement range
-			// The scale attribute determines how much the displacement map affects the image
-			const filterScale = Math.max(maxScale / canvasDPI, 1.0);
-			const currentScale = feDisplacementMap.getAttribute('scale');
-			// Only update if scale actually changed
-			if (currentScale !== filterScale.toString()) {
-				feDisplacementMap.setAttribute(
-					'scale',
-					filterScale.toString(),
-				);
-			}
-		} catch (error) {
-			console.error(
-				'Error creating ImageData:',
-				error,
-				'w:',
-				w,
-				'h:',
-				h,
-				'data.length:',
-				data.length,
+		context.putImageData(new ImageData(data, w, h), 0, 0);
+		feImage.setAttributeNS(
+			'http://www.w3.org/1999/xlink',
+			'href',
+			canvas.toDataURL(),
+		);
+		// Set the SVG filter scale to use the displacement range
+		// The scale attribute determines how much the displacement map affects the image
+		const filterScale = Math.max(maxScale / canvasDPI, 1.0);
+		const currentScale = feDisplacementMap.getAttribute('scale');
+		// Only update if scale actually changed
+		if (currentScale !== filterScale.toString()) {
+			feDisplacementMap.setAttribute(
+				'scale',
+				filterScale.toString(),
 			);
 		}
 	}, [
@@ -938,9 +857,7 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		edgeThicknessPx,
 		swirlOffset,
 		swirlEdges,
-		roundedRectSDF,
 		smoothStep,
-		length,
 	]);
 
 	// ResizeObserver to track container size changes with throttling
@@ -993,7 +910,7 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 
 	// Set up mouse tracking if no external mouse position is provided
 	useEffect(() => {
-		if (externalGlobalMousePos && externalMouseOffset) {
+		if (externalGlobalMousePos) {
 			// External mouse tracking is provided, don't set up internal tracking
 			return;
 		}
@@ -1011,7 +928,6 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		// Mouse leave handler to reset mouse position
 		const handleMouseLeave = () => {
 			setInternalGlobalMousePos(null);
-			setInternalMouseOffset({ x: 0, y: 0 });
 		};
 
 		container.addEventListener('mousemove', handleMouseMove);
@@ -1025,7 +941,7 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 				rafIdRef.current = null;
 			}
 		};
-	}, [handleMouseMove, mouseContainer, externalGlobalMousePos, externalMouseOffset, elasticity]);
+	}, [handleMouseMove, mouseContainer, externalGlobalMousePos, elasticity]);
 
 	// Set up scroll tracking for adaptive properties
 	useEffect(() => {
@@ -1073,30 +989,19 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	}, [enableScrollAdaptation, scrollContainer]);
 
 	// Calculate adaptive properties based on scroll position
-	const adaptiveOpacity = useMemo(() => {
-		if (!enableScrollAdaptation) return undefined;
-		return Math.min(1, 0.7 + (scrollY / 500) * 0.3);
-	}, [enableScrollAdaptation, scrollY]);
+	const adaptiveOpacity = enableScrollAdaptation ? Math.min(1, 0.7 + (scrollY / 500) * 0.3) : undefined;
+	const adaptiveSaturation = enableScrollAdaptation ? Math.min(1.5, 1 + (scrollY / 300) * 0.5) : saturation;
+	const adaptiveBlur = enableScrollAdaptation ? Math.min(30, 20 + (scrollY / 200) * 10) : blur;
 
-	const adaptiveSaturation = useMemo(() => {
-		if (!enableScrollAdaptation) return saturation;
-		return Math.min(1.5, 1 + (scrollY / 300) * 0.5);
-	}, [enableScrollAdaptation, scrollY, saturation]);
+	// Calculate text shadow value for CSS injection
+	const textShadowValue = textShadow === false 
+		? 'none' 
+		: typeof textShadow === 'string' 
+			? textShadow 
+			: '0 1px 2px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.4)';
 
-	const adaptiveBlur = useMemo(() => {
-		if (!enableScrollAdaptation) return blur;
-		return Math.min(30, 20 + (scrollY / 200) * 10);
-	}, [enableScrollAdaptation, scrollY, blur]);
-
-	// Memoize text shadow value for CSS injection
-	const textShadowValue = useMemo(() => {
-		if (textShadow === false) return 'none';
-		if (typeof textShadow === 'string') return textShadow;
-		return '0 1px 2px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.4)';
-	}, [textShadow]);
-
-	// Memoize shining intensity calculations
-	const clampedShiningIntensity = useMemo(() => Math.min(shiningIntensity, 1), [shiningIntensity]);
+	// Clamp shining intensity
+	const clampedShiningIntensity = Math.min(shiningIntensity, 1);
 
 	// Calculate transform style for elasticity effect and press state
 	const transformStyle = useMemo(() => {
@@ -1109,27 +1014,19 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 
 		// Elasticity effect
 		if (elasticity !== 0 && globalMousePos) {
-			try {
-				const translation = calculateElasticTranslation();
-				const scale = calculateDirectionalScale();
-				transforms.push(`translate(${translation.x}px, ${translation.y}px) ${scale}`);
-			} catch (error) {
-				console.warn('Error calculating transform style:', error);
-			}
+			const translation = calculateElasticTranslation();
+			const scale = calculateDirectionalScale();
+			transforms.push(`translate(${translation.x}px, ${translation.y}px) ${scale}`);
 		}
 
 		return transforms.length > 0 ? transforms.join(' ') : undefined;
 	}, [enablePressState, isPressed, elasticity, globalMousePos, calculateElasticTranslation, calculateDirectionalScale]);
 
 	// Calculate morphic transition dimensions
-	const morphicDimensions = useMemo(() => {
-		if (!enableMorphicTransitions) return undefined;
-
-		return {
-			width: isExpanded ? expandedWidth : (collapsedWidth || '100%'),
-			height: isExpanded ? expandedHeight : (collapsedHeight || '100%'),
-		};
-	}, [enableMorphicTransitions, isExpanded, expandedWidth, expandedHeight, collapsedWidth, collapsedHeight]);
+	const morphicDimensions = enableMorphicTransitions ? {
+		width: isExpanded ? expandedWidth : (collapsedWidth || '100%'),
+		height: isExpanded ? expandedHeight : (collapsedHeight || '100%'),
+	} : undefined;
 
 	return (
 		<>

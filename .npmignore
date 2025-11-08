@@ -16,4 +16,6 @@ scripts/
 *.test.tsx
 *.spec.ts
 *.spec.tsx
+# Exclude source maps from NPM package (they're large and not needed for production)
+dist/**/*.map
 

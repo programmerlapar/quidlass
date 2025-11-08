@@ -1,6 +1,6 @@
 {
   "name": "quidlass",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A beautiful liquid glassmorphism React component with customizable effects",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -14,7 +14,9 @@
   },
   "sideEffects": false,
   "files": [
-    "dist",
+    "dist/index.js",
+    "dist/index.esm.js",
+    "dist/index.d.ts",
     "README.md",
     "LICENSE"
   ],
