@@ -630,6 +630,11 @@ postcss@^8.4.43:
     picocolors "^1.1.1"
     source-map-js "^1.2.1"
 
+quidlass@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/quidlass/-/quidlass-1.2.0.tgz#0abd1c8ae091e2d7fc126103f31e5ac274f17398"
+  integrity sha512-po1UgVnvdvyHZg6ZXlISqa86Rzw8Lt+2NP3W5Kn7nb41ZtBPDoV2OlQNe6k8GQCab+qQeqmDMamJmSv3LtWZXA==
+
 react-dom@^19.0.0:
   version "19.2.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-19.2.0.tgz#00ed1e959c365e9a9d48f8918377465466ec3af8"
