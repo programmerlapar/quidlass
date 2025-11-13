@@ -87,13 +87,14 @@ export interface LiquidGlassProps {
 	/**
 	 * Text shadow for text inside the glass container
 	 * Can be a boolean (true = default shadow) or a custom CSS text-shadow value
-	 * @default true
+	 * @default false
 	 */
 	textShadow?: boolean | string;
 	/**
 	 * Text color for text inside the glass container
 	 * Can be any valid CSS color value (e.g., 'white', '#fff', 'rgb(255, 255, 255)', 'rgba(255, 255, 255, 1)')
-	 * @default 'rgb(255, 255, 255)'
+	 * If not specified, text color will not be overridden and will inherit from parent styles
+	 * @default undefined
 	 */
 	textColor?: string;
 	/**
@@ -252,8 +253,8 @@ export interface LiquidGlassProps {
  * @param swirlOffset - Swirl offset controls gap from edges: 0.0=no gap (edges), 1.0=max gap (center) (default: 0.0)
  * @param swirlEdges - Which corner/edge region should have swirl effect (default: 'all')
 	 * @param zIndex - Z-index for layering (default: 9999)
-	 * @param textShadow - Text shadow for text inside (default: true, or custom CSS value)
-	 * @param textColor - Text color for text inside (default: 'rgb(255, 255, 255)', any valid CSS color)
+	 * @param textShadow - Text shadow for text inside (default: false, or custom CSS value)
+	 * @param textColor - Text color for text inside (default: undefined, inherits from parent if not specified)
  * @param tintColor - Tint color for the glass overlay (default: undefined, any valid CSS color)
  * @param shiningBorder - Enable shining glass effect on borders (default: false)
  * @param shiningIntensity - Intensity of shining effect 0.0-1.0 (default: 0.8)
@@ -299,8 +300,8 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	swirlOffset = 0.0,
 	swirlEdges = 'all',
 	zIndex = 9999,
-	textShadow = true,
-	textColor = 'rgb(255, 255, 255)',
+	textShadow = false,
+	textColor,
 	tintColor,
 	shiningBorder = false,
 	shiningIntensity = 0.8,
@@ -1049,7 +1050,7 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 					[data-liquid-glass-content="${id}"] h6,
 					[data-liquid-glass-content="${id}"] div,
 					[data-liquid-glass-content="${id}"] label {
-						color: ${textColor} !important;
+						${textColor ? `color: ${textColor} !important;` : ''}
 						${textShadow !== false ? `text-shadow: ${textShadowValue} !important;` : ''}
 					}
 				`}
