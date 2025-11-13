@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2025-11-14
+
+### Fixed
+- **Default Values**: Updated default values for `textShadow` and `textColor` props
+  - Changed `textShadow` default from `true` to `false` for better default behavior
+  - Changed `textColor` default from `'rgb(255, 255, 255)'` to `undefined` to allow text color inheritance from parent styles
+
+### Documentation
+- Enhanced package description and keywords in `package.json` for better discoverability
+- Improved README.md with quick links, detailed installation instructions, and comprehensive explanation of liquid glassmorphism
+- Enhanced HTML metadata in docs for better SEO and social sharing
+- Added Open Graph and Twitter card metadata for improved visibility on social platforms
+- Added og-image.png for visually appealing social media representation
+
+### Demo
+- Enhanced ControlPanel with structured sections (Basic Appearance, Elasticity, Swirl Effect, Styling & Visual Effects)
+- Added detailed descriptions for each control to guide users on functionality
+- Improved CSS layout and visual separation of control sections
+
 ## [1.2.0] - 2025-11-09
 
 ### Performance
@@ -78,6 +97,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[1.2.1]: https://github.com/programmerlapar/quidlass/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/programmerlapar/quidlass/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/programmerlapar/quidlass/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/programmerlapar/quidlass/releases/tag/v1.0.0

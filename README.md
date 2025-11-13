@@ -94,8 +94,8 @@ const props: LiquidGlassProps = {
 | `swirlOffset` | `number` | `0.0` | Swirl offset: 0.0 = no gap (edges), 1.0 = max gap (center). Controls gap between component edges and swirl effect band |
 | `swirlEdges` | `'all' | 'top-left' | 'top-right' | 'bottom-right' | 'bottom-left' | Array<...>` | `'all'` | Which edge regions get swirl. Can be a single value or an array for multiple regions |
 | `zIndex` | `number` | `9999` | Z-index for layering |
-| `textShadow` | `boolean \| string` | `true` | Text shadow for content |
-| `textColor` | `string` | `'rgb(255, 255, 255)'` | Text color for content |
+| `textShadow` | `boolean \| string` | `false` | Text shadow for content |
+| `textColor` | `string` | `undefined` | Text color for content (inherits from parent if not specified) |
 | `tintColor` | `string` | `undefined` | Tint overlay color (any CSS color) |
 | `shiningBorder` | `boolean` | `false` | Enable shining border effect |
 | `shiningIntensity` | `number` | `0.8` | Intensity of shining effect (0-1) |

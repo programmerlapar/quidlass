@@ -1,6 +1,6 @@
 {
   "name": "quidlass",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Quidlass - Beautiful liquid glassmorphism React component library. Create stunning glass-like UI effects with liquid distortion, customizable blur, swirl effects, and interactive animations. Perfect for modern React apps, cards, modals, buttons, and tooltips. Zero dependencies, TypeScript support, and performance optimized.",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
