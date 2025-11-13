@@ -1,9 +1,23 @@
-# Quidlass
+# Quidlass - Liquid Glassmorphism React Component
 
-A beautiful liquid glassmorphism React component with customizable effects. Create stunning glass-like surfaces with liquid distortion effects, perfect for modern UI designs.
+**Quidlass** is a beautiful, lightweight React component library for creating stunning liquid glassmorphism effects. Perfect for modern React applications, it provides customizable glass-like surfaces with liquid distortion effects, interactive animations, and zero dependencies.
 
-- Documentation: https://programmerlapar.github.io/quidlass/
-- Live Demo: https://programmerlapar.github.io/quidlass/demo/
+## 🚀 Quick Links
+
+- 📖 **Documentation**: https://programmerlapar.github.io/quidlass/
+- 🎨 **Live Demo**: https://programmerlapar.github.io/quidlass/demo/
+- 📦 **npm Package**: [quidlass on npm](https://www.npmjs.com/package/quidlass)
+- 💻 **GitHub Repository**: https://github.com/programmerlapar/quidlass
+
+[![npm version](https://img.shields.io/npm/v/quidlass.svg)](https://www.npmjs.com/package/quidlass)
+[![npm downloads](https://img.shields.io/npm/dm/quidlass.svg)](https://www.npmjs.com/package/quidlass)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/quidlass)](https://www.npmjs.com/package/quidlass)
+[![GitHub stars](https://img.shields.io/github/stars/programmerlapar/quidlass.svg?style=social)](https://github.com/programmerlapar/quidlass)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## What is Liquid Glassmorphism?
+
+Liquid glassmorphism combines the popular glassmorphism design trend with dynamic liquid distortion effects. It creates a frosted glass appearance with animated, morphing edges that respond to user interactions - perfect for cards, modals, buttons, tooltips, and modern UI components.
 
 
 ## Features
@@ -19,6 +33,8 @@ A beautiful liquid glassmorphism React component with customizable effects. Crea
 
 ## Installation
 
+Install Quidlass via npm, yarn, or pnpm:
+
 ```bash
 npm install quidlass
 # or
@@ -26,6 +42,8 @@ yarn add quidlass
 # or
 pnpm add quidlass
 ```
+
+**Search terms**: If you're looking for "liquid glass react", "glassmorphism react component", "react glass effect", "liquid glassmorphism npm", or "react glassmorphism library" - you've found it! Quidlass is the perfect solution for adding beautiful glass effects to your React applications.
 
 ### Requirements
 

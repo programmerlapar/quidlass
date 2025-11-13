@@ -1,7 +1,7 @@
 {
   "name": "quidlass",
   "version": "1.2.0",
-  "description": "A beautiful liquid glassmorphism React component with customizable effects",
+  "description": "Quidlass - Beautiful liquid glassmorphism React component library. Create stunning glass-like UI effects with liquid distortion, customizable blur, swirl effects, and interactive animations. Perfect for modern React apps, cards, modals, buttons, and tooltips. Zero dependencies, TypeScript support, and performance optimized.",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -37,15 +37,39 @@
   },
   "keywords": [
     "react",
+    "react-component",
+    "react-library",
     "glassmorphism",
+    "glass-morphism",
     "liquid-glass",
+    "liquid-glassmorphism",
     "glass-effect",
+    "glass-ui",
     "ui-component",
+    "ui-library",
     "backdrop-filter",
     "svg-filter",
-    "displacement-map"
+    "displacement-map",
+    "blur-effect",
+    "frosted-glass",
+    "glass-card",
+    "glass-button",
+    "glass-modal",
+    "modern-ui",
+    "react-typescript",
+    "typescript",
+    "component-library",
+    "css-effects",
+    "visual-effects",
+    "interactive-ui",
+    "morphic",
+    "elasticity",
+    "swirl-effect"
   ],
-  "author": "programmerlapar",
+  "author": {
+    "name": "programmerlapar",
+    "url": "https://github.com/programmerlapar"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -54,6 +78,10 @@
   "homepage": "https://programmerlapar.github.io/quidlass/",
   "bugs": {
     "url": "https://github.com/programmerlapar/quidlass/issues"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://www.paypal.com/paypalme/programmerlapar"
   },
   "packageManager": "yarn@1.22.22",
   "peerDependencies": {
