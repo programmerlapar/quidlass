@@ -307,7 +307,7 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	shiningIntensity = 0.8,
 	elasticity = 0.15,
 	globalMousePos: externalGlobalMousePos,
-	mouseOffset: externalMouseOffset,
+	mouseOffset: _externalMouseOffset,
 	mouseContainer = null,
 	elasticityActivationZone = 200,
 	enablePressState = false,
@@ -337,6 +337,7 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 
 	const [width, setWidth] = useState(300);
 	const [height, setHeight] = useState(200);
+	const [canvasDPI, setCanvasDPI] = useState(1);
 	const lastSizeRef = useRef({ width: 300, height: 200 });
 
 	// Elasticity state
@@ -363,8 +364,6 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	const isExpanded = enableMorphicTransitions 
 		? (externalIsExpanded !== undefined ? externalIsExpanded : internalIsExpanded)
 		: false;
-
-	const canvasDPI = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
 
 	// Use external mouse position if provided, otherwise use internal
 	const globalMousePos = externalGlobalMousePos || internalGlobalMousePos;
@@ -904,6 +903,35 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		};
 	}, []);
 
+	// Sync device pixel ratio after mount so the first render stays SSR-safe.
+	useEffect(() => {
+		let resolutionQuery: MediaQueryList | null = null;
+
+		const syncCanvasDPI = () => {
+			const nextCanvasDPI = Math.max(window.devicePixelRatio || 1, 1);
+			setCanvasDPI(currentCanvasDPI =>
+				currentCanvasDPI === nextCanvasDPI ? currentCanvasDPI : nextCanvasDPI,
+			);
+
+			if (resolutionQuery) {
+				resolutionQuery.removeEventListener('change', syncCanvasDPI);
+			}
+
+			if (typeof window.matchMedia === 'function') {
+				resolutionQuery = window.matchMedia(`(resolution: ${nextCanvasDPI}dppx)`);
+				resolutionQuery.addEventListener('change', syncCanvasDPI);
+			}
+		};
+
+		syncCanvasDPI();
+		window.addEventListener('resize', syncCanvasDPI);
+
+		return () => {
+			window.removeEventListener('resize', syncCanvasDPI);
+			resolutionQuery?.removeEventListener('change', syncCanvasDPI);
+		};
+	}, []);
+
 	// Update shader when component mounts or parameters change
 	useEffect(() => {
 		updateShader();
@@ -1349,4 +1377,3 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 };
 
 export default memo(LiquidGlass);
-
