@@ -431,6 +431,10 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		const edgeDistanceY = Math.max(0, Math.abs(globalMousePos.y - componentCenterY) - componentHeight / 2);
 		const edgeDistance = Math.sqrt(edgeDistanceX * edgeDistanceX + edgeDistanceY * edgeDistanceY);
 
+		if (elasticityActivationZone <= 0) {
+			return null;
+		}
+
 		// If outside activation zone, no effect
 		if (edgeDistance > elasticityActivationZone) {
 			return null;

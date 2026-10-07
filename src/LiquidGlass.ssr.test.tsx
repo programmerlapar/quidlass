@@ -109,3 +109,31 @@ describe('LiquidGlass SSR hydration', () => {
 		expect(toDataURLSpy).toHaveBeenCalledTimes(initialCallCount);
 	});
 });
+
+describe('LiquidGlass elasticity', () => {
+	it.each([0, -1])('does not produce an invalid transform for an activation zone of %s', async (elasticityActivationZone) => {
+		const { container, rerender } = render(
+			<LiquidGlass
+				globalMousePos={{ x: 150, y: 100 }}
+				elasticityActivationZone={elasticityActivationZone}
+			/>,
+		);
+		const glass = container.querySelector<HTMLElement>('[data-liquid-glass]');
+
+		expect(glass).not.toBeNull();
+		Object.defineProperty(glass, 'getBoundingClientRect', {
+			configurable: true,
+			value: () => ({ left: 0, top: 0, width: 300, height: 200 }),
+		});
+		rerender(
+			<LiquidGlass
+				globalMousePos={{ x: 150, y: 100 }}
+				elasticityActivationZone={elasticityActivationZone}
+			/>,
+		);
+
+		await waitFor(() => {
+			expect(glass?.style.transform).not.toContain('NaN');
+		});
+	});
+});
