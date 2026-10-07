@@ -103,7 +103,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0"
                 max="50"
                 step="1"
-                value={props.borderRadius || 20}
+                value={props.borderRadius ?? 20}
                 onChange={handleSliderChange('borderRadius')}
                 className="control-slider"
               />
@@ -111,7 +111,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 type="number"
                 min="0"
                 max="50"
-                value={props.borderRadius || 20}
+                value={props.borderRadius ?? 20}
                 onChange={handleNumberInput('borderRadius')}
                 className="control-input"
               />
@@ -127,7 +127,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0"
                 max="30"
                 step="0.1"
-                value={props.blur || 0.25}
+                value={props.blur ?? 0.25}
                 onChange={handleSliderChange('blur')}
                 className="control-slider"
               />
@@ -136,7 +136,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0"
                 max="30"
                 step="0.1"
-                value={props.blur || 0.25}
+                value={props.blur ?? 0.25}
                 onChange={handleNumberInput('blur')}
                 className="control-input"
               />
@@ -152,7 +152,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0.5"
                 max="2"
                 step="0.01"
-                value={props.contrast || 1.2}
+                value={props.contrast ?? 1.2}
                 onChange={handleSliderChange('contrast')}
                 className="control-slider"
               />
@@ -161,7 +161,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0.5"
                 max="2"
                 step="0.01"
-                value={props.contrast || 1.2}
+                value={props.contrast ?? 1.2}
                 onChange={handleNumberInput('contrast')}
                 className="control-input"
               />
@@ -177,7 +177,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0.5"
                 max="2"
                 step="0.01"
-                value={props.brightness || 1.05}
+                value={props.brightness ?? 1.05}
                 onChange={handleSliderChange('brightness')}
                 className="control-slider"
               />
@@ -186,7 +186,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0.5"
                 max="2"
                 step="0.01"
-                value={props.brightness || 1.05}
+                value={props.brightness ?? 1.05}
                 onChange={handleNumberInput('brightness')}
                 className="control-input"
               />
@@ -202,7 +202,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0"
                 max="2"
                 step="0.01"
-                value={props.saturation || 1.1}
+                value={props.saturation ?? 1.1}
                 onChange={handleSliderChange('saturation')}
                 className="control-slider"
               />
@@ -211,7 +211,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0"
                 max="2"
                 step="0.01"
-                value={props.saturation || 1.1}
+                value={props.saturation ?? 1.1}
                 onChange={handleNumberInput('saturation')}
                 className="control-input"
               />
@@ -227,7 +227,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0"
                 max="1"
                 step="0.01"
-                value={props.shadowIntensity || 0.25}
+                value={props.shadowIntensity ?? 0.25}
                 onChange={handleSliderChange('shadowIntensity')}
                 className="control-slider"
               />
@@ -236,7 +236,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0"
                 max="1"
                 step="0.01"
-                value={props.shadowIntensity || 0.25}
+                value={props.shadowIntensity ?? 0.25}
                 onChange={handleNumberInput('shadowIntensity')}
                 className="control-input"
               />
@@ -314,7 +314,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0"
                 max="20"
                 step="0.1"
-                value={props.swirlIntensity || 8}
+                value={props.swirlIntensity ?? 8}
                 onChange={handleSliderChange('swirlIntensity')}
                 className="control-slider"
               />
@@ -323,7 +323,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0"
                 max="20"
                 step="0.1"
-                value={props.swirlIntensity || 8}
+                value={props.swirlIntensity ?? 8}
                 onChange={handleNumberInput('swirlIntensity')}
                 className="control-input"
               />
@@ -339,7 +339,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0.1"
                 max="3"
                 step="0.1"
-                value={props.swirlScale || 1.0}
+                value={props.swirlScale ?? 1.0}
                 onChange={handleSliderChange('swirlScale')}
                 className="control-slider"
               />
@@ -348,7 +348,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0.1"
                 max="3"
                 step="0.1"
-                value={props.swirlScale || 1.0}
+                value={props.swirlScale ?? 1.0}
                 onChange={handleNumberInput('swirlScale')}
                 className="control-input"
               />
@@ -364,7 +364,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0.1"
                 max="3"
                 step="0.1"
-                value={props.swirlRadius || 1.0}
+                value={props.swirlRadius ?? 1.0}
                 onChange={handleSliderChange('swirlRadius')}
                 className="control-slider"
               />
@@ -373,7 +373,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0.1"
                 max="3"
                 step="0.1"
-                value={props.swirlRadius || 1.0}
+                value={props.swirlRadius ?? 1.0}
                 onChange={handleNumberInput('swirlRadius')}
                 className="control-input"
               />
@@ -389,7 +389,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="1"
                 max="50"
                 step="1"
-                value={props.edgeThicknessPx || 12}
+                value={props.edgeThicknessPx ?? 12}
                 onChange={handleSliderChange('edgeThicknessPx')}
                 className="control-slider"
               />
@@ -398,7 +398,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="1"
                 max="50"
                 step="1"
-                value={props.edgeThicknessPx || 12}
+                value={props.edgeThicknessPx ?? 12}
                 onChange={handleNumberInput('edgeThicknessPx')}
                 className="control-input"
               />
@@ -489,7 +489,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0"
                 max="10000"
                 step="100"
-                value={props.zIndex || 9999}
+                value={props.zIndex ?? 9999}
                 onChange={handleSliderChange('zIndex')}
                 className="control-slider"
               />
@@ -498,7 +498,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 min="0"
                 max="10000"
                 step="100"
-                value={props.zIndex || 9999}
+                value={props.zIndex ?? 9999}
                 onChange={handleNumberInput('zIndex')}
                 className="control-input"
               />
@@ -612,7 +612,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                   min="0"
                   max="1"
                   step="0.01"
-                  value={props.shiningIntensity || 0.8}
+                  value={props.shiningIntensity ?? 0.8}
                   onChange={handleSliderChange('shiningIntensity')}
                   className="control-slider"
                 />
@@ -621,7 +621,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                   min="0"
                   max="1"
                   step="0.01"
-                  value={props.shiningIntensity || 0.8}
+                  value={props.shiningIntensity ?? 0.8}
                   onChange={handleNumberInput('shiningIntensity')}
                   className="control-input"
                 />
@@ -719,11 +719,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
                 <div className="control-group">
                   <label className="control-label">
-                    Expanded Width: {typeof props.expandedWidth === 'number' ? `${props.expandedWidth}px` : props.expandedWidth || '400px'}
+                    Expanded Width: {typeof props.expandedWidth === 'number' ? `${props.expandedWidth}px` : props.expandedWidth ?? '400px'}
                   </label>
                   <input
                     type="text"
-                    value={props.expandedWidth || 400}
+                    value={props.expandedWidth ?? 400}
                     onChange={(e) => {
                       const value = e.target.value;
                       const numValue = parseFloat(value);
@@ -737,11 +737,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
                 <div className="control-group">
                   <label className="control-label">
-                    Expanded Height: {typeof props.expandedHeight === 'number' ? `${props.expandedHeight}px` : props.expandedHeight || '320px'}
+                    Expanded Height: {typeof props.expandedHeight === 'number' ? `${props.expandedHeight}px` : props.expandedHeight ?? '320px'}
                   </label>
                   <input
                     type="text"
-                    value={props.expandedHeight || 320}
+                    value={props.expandedHeight ?? 320}
                     onChange={(e) => {
                       const value = e.target.value;
                       const numValue = parseFloat(value);
@@ -755,11 +755,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
                 <div className="control-group">
                   <label className="control-label">
-                    Collapsed Width: {typeof props.collapsedWidth === 'number' ? `${props.collapsedWidth}px` : props.collapsedWidth || 'auto'}
+                    Collapsed Width: {typeof props.collapsedWidth === 'number' ? `${props.collapsedWidth}px` : props.collapsedWidth ?? 'auto'}
                   </label>
                   <input
                     type="text"
-                    value={props.collapsedWidth || ''}
+                    value={props.collapsedWidth ?? ''}
                     onChange={(e) => {
                       const value = e.target.value;
                       if (!value) {
@@ -777,11 +777,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
                 <div className="control-group">
                   <label className="control-label">
-                    Collapsed Height: {typeof props.collapsedHeight === 'number' ? `${props.collapsedHeight}px` : props.collapsedHeight || 'auto'}
+                    Collapsed Height: {typeof props.collapsedHeight === 'number' ? `${props.collapsedHeight}px` : props.collapsedHeight ?? 'auto'}
                   </label>
                   <input
                     type="text"
-                    value={props.collapsedHeight || ''}
+                    value={props.collapsedHeight ?? ''}
                     onChange={(e) => {
                       const value = e.target.value;
                       if (!value) {
@@ -863,4 +863,3 @@ function generateCode(props: LiquidGlassProps): string {
 
   return `<LiquidGlass\n${propsArray.join('\n')}\n>\n  {/* Your content here */}\n</LiquidGlass>`;
 }
-
