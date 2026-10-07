@@ -1272,7 +1272,7 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 							zIndex: 1,
 							borderRadius: `${borderRadius}px`,
 							background: `radial-gradient(circle at ${touchPoint.x}px ${touchPoint.y}px,
-								rgba(255, 255, 255, ${isPressed ? 0.4 : 0}),
+								rgba(255, 255, 255, 0.4),
 								transparent 60%)`,
 							transition: 'background 0.2s ease',
 						}}
