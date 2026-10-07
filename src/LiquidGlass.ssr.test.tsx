@@ -3,7 +3,7 @@ import { act } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import LiquidGlass from './LiquidGlass';
+import LiquidGlass, { getCanvasDPI } from './LiquidGlass';
 
 class ResizeObserverMock {
 	observe() {}
@@ -49,6 +49,13 @@ afterEach(() => {
 });
 
 describe('LiquidGlass SSR hydration', () => {
+	it('caps high-DPI canvas work while preserving normal DPR output', () => {
+		expect(getCanvasDPI(300, 200, 1)).toBe(1);
+		expect(getCanvasDPI(300, 200, 2)).toBe(2);
+		expect(getCanvasDPI(300, 200, 4)).toBe(2);
+		expect(getCanvasDPI(1000, 1000, 2)).toBeCloseTo(Math.sqrt(2));
+	});
+
 	it('renders stable initial canvas dimensions regardless of devicePixelRatio', () => {
 		const html = renderToString(<LiquidGlass />);
 

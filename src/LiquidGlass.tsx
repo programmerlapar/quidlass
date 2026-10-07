@@ -1,6 +1,27 @@
 import type React from 'react';
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
+const MAX_CANVAS_DPI = 2;
+const MAX_CANVAS_PIXELS = 2_000_000;
+
+/**
+ * Bound synchronous displacement-map generation on high-density displays.
+ * Keeping the usual 1x/2x cases intact preserves sharp output without allowing
+ * a large surface or an unusually high DPR to allocate excessive buffers.
+ */
+export const getCanvasDPI = (
+	width: number,
+	height: number,
+	devicePixelRatio: number,
+): number => {
+	const safeWidth = Math.max(1, width);
+	const safeHeight = Math.max(1, height);
+	const safeDPI = Number.isFinite(devicePixelRatio) ? Math.max(devicePixelRatio, 1) : 1;
+	const pixelBudgetDPI = Math.sqrt(MAX_CANVAS_PIXELS / (safeWidth * safeHeight));
+
+	return Math.min(safeDPI, MAX_CANVAS_DPI, Math.max(pixelBudgetDPI, 1));
+};
+
 export interface LiquidGlassProps {
 	/**
 	 * Border radius in pixels for the glass container
@@ -908,7 +929,7 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		let resolutionQuery: MediaQueryList | null = null;
 
 		const syncCanvasDPI = () => {
-			const nextCanvasDPI = Math.max(window.devicePixelRatio || 1, 1);
+			const nextCanvasDPI = getCanvasDPI(width, height, window.devicePixelRatio || 1);
 			setCanvasDPI(currentCanvasDPI =>
 				currentCanvasDPI === nextCanvasDPI ? currentCanvasDPI : nextCanvasDPI,
 			);
@@ -930,7 +951,7 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 			window.removeEventListener('resize', syncCanvasDPI);
 			resolutionQuery?.removeEventListener('change', syncCanvasDPI);
 		};
-	}, []);
+	}, [height, width]);
 
 	// Update shader when component mounts or parameters change
 	useEffect(() => {
