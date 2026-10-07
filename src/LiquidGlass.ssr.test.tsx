@@ -1,4 +1,4 @@
-import { waitFor } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import { act } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
@@ -27,11 +27,13 @@ const canvasContext = {
 	putImageData: vi.fn(),
 };
 
+const toDataURLSpy = vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL');
+
 beforeAll(() => {
 	vi.stubGlobal('ResizeObserver', ResizeObserverMock);
 	vi.stubGlobal('ImageData', ImageDataMock);
 	vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => canvasContext as unknown as CanvasRenderingContext2D);
-	vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue('data:image/png;base64,stub');
+	toDataURLSpy.mockReturnValue('data:image/png;base64,stub');
 });
 
 beforeEach(() => {
@@ -83,5 +85,21 @@ describe('LiquidGlass SSR hydration', () => {
 		act(() => {
 			root?.unmount();
 		});
+	});
+
+	it('does not regenerate the displacement map for unrelated interaction state updates', async () => {
+		const { container } = render(<LiquidGlass enableInnerGlow />);
+
+		await waitFor(() => {
+			expect(toDataURLSpy).toHaveBeenCalled();
+		});
+
+		const initialCallCount = toDataURLSpy.mock.calls.length;
+		const glass = container.querySelector('[data-liquid-glass]');
+		expect(glass).not.toBeNull();
+
+		fireEvent.mouseMove(glass!, { clientX: 10, clientY: 10 });
+
+		expect(toDataURLSpy).toHaveBeenCalledTimes(initialCallCount);
 	});
 });
