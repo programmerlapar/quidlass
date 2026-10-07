@@ -39,8 +39,16 @@ jobs:
       - name: Build library
         run: yarn build
 
+      - name: Install demo dependencies
+        run: yarn --cwd demo install --frozen-lockfile
+
+      - name: Link built library into demo
+        run: |
+          yarn link
+          yarn --cwd demo link quidlass
+
       - name: Build demo
-        run: cd demo && yarn install --frozen-lockfile && yarn build
+        run: yarn --cwd demo build
 
       - name: Copy README into docs
         run: cp README.md docs/README.md
