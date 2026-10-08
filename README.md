@@ -87,7 +87,7 @@ const props: LiquidGlassProps = {
 | `brightness` | `number` | `1.05` | Brightness multiplier |
 | `saturation` | `number` | `1.1` | Saturation multiplier |
 | `shadowIntensity` | `number` | `0.25` | Shadow opacity |
-| `swirlIntensity` | `number` | `8` | Swirl intensity for vortex effect |
+| `swirlIntensity` | `number` | `8` | Swirl intensity for vortex effect (clamped to 0-20) |
 | `swirlScale` | `number` | `1.0` | Swirl scale controls size/zoom |
 | `swirlRadius` | `number` | `1.0` | Swirl radius controls extent |
 | `edgeThicknessPx` | `number` | `12` | Edge thickness in pixels |

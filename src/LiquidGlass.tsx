@@ -44,6 +44,7 @@ export interface LiquidGlassProps {
 	 * Swirl intensity for the vortex effect
 	 * Higher values create stronger swirl patterns, especially near borders
 	 * Simulates liquid being poured into the center
+	 * Values are clamped to the documented range of 0 to 20
 	 * @default 8
 	 */
 	swirlIntensity?: number;
@@ -262,7 +263,7 @@ const smoothStep = (a: number, b: number, t: number) => {
  * @param brightness - Brightness multiplier (default: 1.05)
  * @param saturation - Saturation multiplier (default: 1.1)
  * @param shadowIntensity - Shadow opacity (default: 0.25)
- * @param swirlIntensity - Swirl intensity for vortex effect (default: 8)
+ * @param swirlIntensity - Swirl intensity for vortex effect, clamped to 0-20 (default: 8)
  * @param swirlScale - Swirl scale controls size/zoom (default: 1.0)
  * @param swirlRadius - Swirl radius controls extent from center/edges (default: 1.0)
  * @param edgeThicknessPx - Thickness in pixels of edge band where swirl is applied (default: 12)
@@ -640,10 +641,13 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		// Calculate base displacement factor, ensuring minimum for small components
 		// This ensures swirl effect is visible on buttons and small components
 		const baseDisplacementFactor = Math.max((minDimension / 100.0) * 0.05, 0.01);
-		const displacementFactor = baseDisplacementFactor * (swirlIntensity / 10.0);
+		const effectiveSwirlIntensity = Number.isFinite(swirlIntensity)
+			? Math.min(Math.max(swirlIntensity, 0), 20)
+			: 0;
+		const displacementFactor = baseDisplacementFactor * (effectiveSwirlIntensity / 10.0);
 		const swirlScaleClamped = Math.max(swirlScale, 0.1);
 		const swirlRadiusClamped = Math.max(swirlRadius, 0.1);
-		const swirlIntensityFactor = swirlIntensity / 10;
+		const swirlIntensityFactor = effectiveSwirlIntensity / 10;
 		const twoPi = Math.PI * 2;
 
 		// Precompute swirl region checks if needed
