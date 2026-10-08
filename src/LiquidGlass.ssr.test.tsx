@@ -58,6 +58,12 @@ describe('LiquidGlass SSR hydration', () => {
 		expect(html).toContain('height="200"');
 	});
 
+	it('keeps the inner glow visible without press state enabled', () => {
+		const html = renderToString(<LiquidGlass enableInnerGlow />);
+
+		expect(html).toContain('rgba(255, 255, 255, 0.4)');
+	});
+
 	it('hydrates without a canvas width/height mismatch and updates DPR after mount', async () => {
 		const serverHtml = renderToString(<LiquidGlass />);
 		const container = document.createElement('div');
