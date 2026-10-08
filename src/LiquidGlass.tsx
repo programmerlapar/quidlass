@@ -237,14 +237,6 @@ export interface LiquidGlassProps {
 }
 
 /**
- * Smooth step interpolation function for easing.
- */
-const smoothStep = (a: number, b: number, t: number) => {
-	t = Math.max(0, Math.min(1, (t - a) / (b - a)));
-	return t * t * (3 - 2 * t);
-};
-
-/**
  * LiquidGlass component creates a liquid glassmorphism effect using SVG filters and canvas displacement maps.
  * 
  * This component generates a glass-like surface that shows content beneath it with a liquid distortion effect.
@@ -430,6 +422,10 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		const edgeDistanceX = Math.max(0, Math.abs(globalMousePos.x - componentCenterX) - componentWidth / 2);
 		const edgeDistanceY = Math.max(0, Math.abs(globalMousePos.y - componentCenterY) - componentHeight / 2);
 		const edgeDistance = Math.sqrt(edgeDistanceX * edgeDistanceX + edgeDistanceY * edgeDistanceY);
+
+		if (elasticityActivationZone <= 0) {
+			return null;
+		}
 
 		// If outside activation zone, no effect
 		if (edgeDistance > elasticityActivationZone) {
