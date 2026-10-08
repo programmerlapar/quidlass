@@ -3,7 +3,7 @@ import { act } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import LiquidGlass from './LiquidGlass';
+import LiquidGlass, { getCanvasDPI } from './LiquidGlass';
 
 class ResizeObserverMock {
 	observe() {}
@@ -49,6 +49,25 @@ afterEach(() => {
 });
 
 describe('LiquidGlass SSR hydration', () => {
+	it('caps high-DPI canvas work while preserving normal DPR output', () => {
+		expect(getCanvasDPI(300, 200, 1)).toBe(1);
+		expect(getCanvasDPI(300, 200, 2)).toBe(2);
+		expect(getCanvasDPI(300, 200, 4)).toBe(2);
+		expect(getCanvasDPI(1000, 1000, 2)).toBeCloseTo(Math.sqrt(2));
+	});
+
+	it('keeps oversized surfaces within the pixel budget after integer rasterization', () => {
+		const width = 2001;
+		const height = 1000;
+		const canvasDPI = getCanvasDPI(width, height, 2);
+		const rasterWidth = Math.max(1, Math.floor(width * canvasDPI));
+		const rasterHeight = Math.max(1, Math.floor(height * canvasDPI));
+
+		expect(width * height).toBeGreaterThan(2_000_000);
+		expect(canvasDPI).toBeLessThan(1);
+		expect(rasterWidth * rasterHeight).toBeLessThanOrEqual(2_000_000);
+	});
+
 	it('renders stable initial canvas dimensions regardless of devicePixelRatio', () => {
 		const html = renderToString(<LiquidGlass />);
 
@@ -68,6 +87,9 @@ describe('LiquidGlass SSR hydration', () => {
 		await act(async () => {
 			root = hydrateRoot(container, <LiquidGlass />);
 		});
+		expect(canvasContext.putImageData.mock.calls[0]?.[0]).toEqual(
+			expect.objectContaining({ width: 600, height: 400 }),
+		);
 
 		const canvas = container.querySelector('canvas');
 		expect(canvas).not.toBeNull();
