@@ -19,7 +19,7 @@ export const getCanvasDPI = (
 	const safeDPI = Number.isFinite(devicePixelRatio) ? Math.max(devicePixelRatio, 1) : 1;
 	const pixelBudgetDPI = Math.sqrt(MAX_CANVAS_PIXELS / (safeWidth * safeHeight));
 
-	return Math.min(safeDPI, MAX_CANVAS_DPI, Math.max(pixelBudgetDPI, 1));
+	return Math.min(safeDPI, MAX_CANVAS_DPI, pixelBudgetDPI);
 };
 
 export interface LiquidGlassProps {
@@ -359,6 +359,8 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	const [width, setWidth] = useState(300);
 	const [height, setHeight] = useState(200);
 	const [canvasDPI, setCanvasDPI] = useState(1);
+	const canvasWidth = Math.max(1, Math.floor(width * canvasDPI));
+	const canvasHeight = Math.max(1, Math.floor(height * canvasDPI));
 	const lastSizeRef = useRef({ width: 300, height: 200 });
 
 	// Elasticity state
@@ -601,8 +603,8 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		const context = canvas.getContext('2d');
 		if (!context) return;
 
-		const w = Math.max(1, Math.floor(width * canvasDPI));
-		const h = Math.max(1, Math.floor(height * canvasDPI));
+		const w = canvasWidth;
+		const h = canvasHeight;
 
 		// Ensure we have valid dimensions
 		if (w <= 0 || h <= 0) return;
@@ -871,6 +873,8 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		width,
 		height,
 		canvasDPI,
+		canvasWidth,
+		canvasHeight,
 		borderRadius,
 		swirlIntensity,
 		swirlScale,
@@ -1152,8 +1156,8 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 			{/* Hidden Canvas for displacement map generation */}
 			<canvas
 				ref={canvasRef}
-				width={width * canvasDPI}
-				height={height * canvasDPI}
+				width={canvasWidth}
+				height={canvasHeight}
 				style={{
 					display: 'none',
 				}}

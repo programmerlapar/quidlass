@@ -56,6 +56,18 @@ describe('LiquidGlass SSR hydration', () => {
 		expect(getCanvasDPI(1000, 1000, 2)).toBeCloseTo(Math.sqrt(2));
 	});
 
+	it('keeps oversized surfaces within the pixel budget after integer rasterization', () => {
+		const width = 2001;
+		const height = 1000;
+		const canvasDPI = getCanvasDPI(width, height, 2);
+		const rasterWidth = Math.max(1, Math.floor(width * canvasDPI));
+		const rasterHeight = Math.max(1, Math.floor(height * canvasDPI));
+
+		expect(width * height).toBeGreaterThan(2_000_000);
+		expect(canvasDPI).toBeLessThan(1);
+		expect(rasterWidth * rasterHeight).toBeLessThanOrEqual(2_000_000);
+	});
+
 	it('renders stable initial canvas dimensions regardless of devicePixelRatio', () => {
 		const html = renderToString(<LiquidGlass />);
 
