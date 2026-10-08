@@ -228,6 +228,14 @@ export interface LiquidGlassProps {
 }
 
 /**
+ * Smooth step interpolation function for easing.
+ */
+const smoothStep = (a: number, b: number, t: number) => {
+	t = Math.max(0, Math.min(1, (t - a) / (b - a)));
+	return t * t * (3 - 2 * t);
+};
+
+/**
  * LiquidGlass component creates a liquid glassmorphism effect using SVG filters and canvas displacement maps.
  * 
  * This component generates a glass-like surface that shows content beneath it with a liquid distortion effect.
@@ -367,18 +375,6 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 
 	// Use external mouse position if provided, otherwise use internal
 	const globalMousePos = externalGlobalMousePos || internalGlobalMousePos;
-
-	/**
-	 * Smooth step interpolation function for easing
-	 * @param a - Lower bound
-	 * @param b - Upper bound
-	 * @param t - Interpolation value (0-1)
-	 * @returns Interpolated value between a and b
-	 */
-	const smoothStep = (a: number, b: number, t: number) => {
-		t = Math.max(0, Math.min(1, (t - a) / (b - a)));
-		return t * t * (3 - 2 * t);
-	};
 
 	/**
 	 * Internal mouse tracking handler
@@ -857,7 +853,6 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		edgeThicknessPx,
 		swirlOffset,
 		swirlEdges,
-		smoothStep,
 	]);
 
 	// ResizeObserver to track container size changes with throttling
