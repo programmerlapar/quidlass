@@ -87,6 +87,9 @@ describe('LiquidGlass SSR hydration', () => {
 		await act(async () => {
 			root = hydrateRoot(container, <LiquidGlass />);
 		});
+		expect(canvasContext.putImageData.mock.calls[0]?.[0]).toEqual(
+			expect.objectContaining({ width: 600, height: 400 }),
+		);
 
 		const canvas = container.querySelector('canvas');
 		expect(canvas).not.toBeNull();

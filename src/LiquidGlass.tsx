@@ -600,11 +600,19 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 
 		if (!canvas || !feImage || !feDisplacementMap) return;
 
+		// Read the runtime DPR before resizing or allocating the raster so the
+		// first client-side generation does not use the SSR fallback DPI.
+		const rasterDPI = typeof window === 'undefined'
+			? canvasDPI
+			: getCanvasDPI(width, height, window.devicePixelRatio || 1);
+		const rasterWidth = Math.max(1, Math.floor(width * rasterDPI));
+		const rasterHeight = Math.max(1, Math.floor(height * rasterDPI));
+
 		const context = canvas.getContext('2d');
 		if (!context) return;
 
-		const w = canvasWidth;
-		const h = canvasHeight;
+		const w = rasterWidth;
+		const h = rasterHeight;
 
 		// Ensure we have valid dimensions
 		if (w <= 0 || h <= 0) return;
@@ -626,9 +634,9 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		const containerH = h;
 		const halfW = containerW / 2;
 		const halfH = containerH / 2;
-		const sdfW = halfW - borderRadius * canvasDPI;
-		const sdfH = halfH - borderRadius * canvasDPI;
-		const sdfRadius = borderRadius * canvasDPI;
+		const sdfW = halfW - borderRadius * rasterDPI;
+		const sdfH = halfH - borderRadius * rasterDPI;
+		const sdfRadius = borderRadius * rasterDPI;
 		const maxRadius = Math.sqrt(0.5 * 0.5 + 0.5 * 0.5); // Max distance from center
 		const minDimension = Math.min(w, h);
 		
@@ -651,7 +659,7 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 			adaptiveThreshold = Math.min(minDimension * 0.6, maxPossibleDistance);
 		} else {
 			// For larger components, use configured value
-			adaptiveThreshold = Math.min(edgeThicknessPx * canvasDPI, minDimension * 0.4, maxPossibleDistance);
+			adaptiveThreshold = Math.min(edgeThicknessPx * rasterDPI, minDimension * 0.4, maxPossibleDistance);
 		}
 		// Ensure threshold is at least 1 pixel but never exceeds max possible distance
 		const threshold = Math.max(Math.min(adaptiveThreshold, maxPossibleDistance), 1);
@@ -860,7 +868,7 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		);
 		// Set the SVG filter scale to use the displacement range
 		// The scale attribute determines how much the displacement map affects the image
-		const filterScale = Math.max(maxScale / canvasDPI, 1.0);
+		const filterScale = Math.max(maxScale / rasterDPI, 1.0);
 		const currentScale = feDisplacementMap.getAttribute('scale');
 		// Only update if scale actually changed
 		if (currentScale !== filterScale.toString()) {
