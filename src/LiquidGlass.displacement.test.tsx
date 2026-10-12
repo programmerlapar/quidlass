@@ -27,8 +27,12 @@ const canvasContext = {
 beforeAll(() => {
 	vi.stubGlobal('ResizeObserver', ResizeObserverMock);
 	vi.stubGlobal('ImageData', ImageDataMock);
+	vi.stubGlobal('URL', {
+		createObjectURL: vi.fn(() => 'blob:liquid-glass'),
+		revokeObjectURL: vi.fn(),
+	});
 	vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => canvasContext as unknown as CanvasRenderingContext2D);
-	vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue('data:image/png;base64,stub');
+	vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(callback => callback(new Blob(['stub'], { type: 'image/png' })));
 });
 
 beforeEach(() => {
