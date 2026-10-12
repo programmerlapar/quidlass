@@ -27,13 +27,20 @@ const canvasContext = {
 	putImageData: vi.fn(),
 };
 
+const toBlobSpy = vi.spyOn(HTMLCanvasElement.prototype, 'toBlob');
 const toDataURLSpy = vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL');
+const createObjectURLSpy = vi.fn(() => 'blob:liquid-glass');
+const revokeObjectURLSpy = vi.fn();
 
 beforeAll(() => {
 	vi.stubGlobal('ResizeObserver', ResizeObserverMock);
 	vi.stubGlobal('ImageData', ImageDataMock);
+	vi.stubGlobal('URL', {
+		createObjectURL: createObjectURLSpy,
+		revokeObjectURL: revokeObjectURLSpy,
+	});
 	vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => canvasContext as unknown as CanvasRenderingContext2D);
-	toDataURLSpy.mockReturnValue('data:image/png;base64,stub');
+	toBlobSpy.mockImplementation(callback => callback(new Blob(['stub'], { type: 'image/png' })));
 });
 
 beforeEach(() => {
@@ -119,15 +126,16 @@ describe('LiquidGlass SSR hydration', () => {
 		const { container } = render(<LiquidGlass enableInnerGlow />);
 
 		await waitFor(() => {
-			expect(toDataURLSpy).toHaveBeenCalled();
+			expect(toBlobSpy).toHaveBeenCalled();
 		});
+		expect(toDataURLSpy).not.toHaveBeenCalled();
 
-		const initialCallCount = toDataURLSpy.mock.calls.length;
+		const initialCallCount = toBlobSpy.mock.calls.length;
 		const glass = container.querySelector('[data-liquid-glass]');
 		expect(glass).not.toBeNull();
 
 		fireEvent.mouseMove(glass!, { clientX: 10, clientY: 10 });
 
-		expect(toDataURLSpy).toHaveBeenCalledTimes(initialCallCount);
+		expect(toBlobSpy).toHaveBeenCalledTimes(initialCallCount);
 	});
 });

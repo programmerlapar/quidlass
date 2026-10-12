@@ -258,14 +258,6 @@ export interface LiquidGlassProps {
 }
 
 /**
- * Smooth step interpolation function for easing.
- */
-const smoothStep = (a: number, b: number, t: number) => {
-	t = Math.max(0, Math.min(1, (t - a) / (b - a)));
-	return t * t * (3 - 2 * t);
-};
-
-/**
  * LiquidGlass component creates a liquid glassmorphism effect using SVG filters and canvas displacement maps.
  * 
  * This component generates a glass-like surface that shows content beneath it with a liquid distortion effect.
@@ -369,6 +361,8 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const feImageRef = useRef<SVGFEImageElement>(null);
 	const feDisplacementMapRef = useRef<SVGFEDisplacementMapElement>(null);
+	const displacementUrlRef = useRef<string | null>(null);
+	const renderGenerationRef = useRef(0);
 
 	const reactId = useId();
 	const id = `liquid-glass-${reactId.replace(/:/g, '-')}`;
@@ -869,11 +863,22 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		}
 
 		context.putImageData(new ImageData(data, w, h), 0, 0);
-		feImage.setAttributeNS(
-			'http://www.w3.org/1999/xlink',
-			'href',
-			canvas.toDataURL(),
-		);
+		const renderGeneration = ++renderGenerationRef.current;
+		canvas.toBlob(blob => {
+			if (!blob || renderGeneration !== renderGenerationRef.current) return;
+
+			const displacementUrl = URL.createObjectURL(blob);
+			const previousUrl = displacementUrlRef.current;
+			displacementUrlRef.current = displacementUrl;
+			feImage.setAttributeNS(
+				'http://www.w3.org/1999/xlink',
+				'href',
+				displacementUrl,
+			);
+			if (previousUrl) {
+				URL.revokeObjectURL(previousUrl);
+			}
+		});
 		// Set the SVG filter scale to use the displacement range
 		// The scale attribute determines how much the displacement map affects the image
 		const filterScale = Math.max(maxScale / rasterDPI, 1.0);
@@ -899,6 +904,14 @@ const LiquidGlass: React.FC<LiquidGlassProps> = ({
 		swirlOffset,
 		swirlEdges,
 	]);
+
+	useEffect(() => () => {
+		renderGenerationRef.current += 1;
+		if (displacementUrlRef.current) {
+			URL.revokeObjectURL(displacementUrlRef.current);
+			displacementUrlRef.current = null;
+		}
+	}, []);
 
 	// ResizeObserver to track container size changes with throttling
 	useEffect(() => {
